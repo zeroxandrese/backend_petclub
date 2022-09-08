@@ -17,19 +17,16 @@ const SchemaImg = Schema({
     descripcion:{
         type: String
     },
-    comments:{
-        type: String
-    },
-    like:{
-        type: Number
-    },
-    alert:{
-        type: Number
-    },
     charged:{
         type: Date,
         default: Date.now
     }
 });
+
+SchemaImg.methods.toJSON = function(){
+    const { __v, _id, ...image } = this.toObject();
+    image.uid = _id
+    return image;
+}
 
 module.exports = model('Image', SchemaImg);

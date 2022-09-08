@@ -3,20 +3,22 @@ const path = require('path');
 const fs = require('fs');
 
 const cloudinary = require('cloudinary').v2;
-cloudinary.config( process.env.CLOUDINARY_URL);
+cloudinary.config(process.env.CLOUDINARY_URL);
 
 const { uploadFileValidation } = require('../helpers/upload-file');
 const { User, Image } = require('../models');
 const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
 
-const uploadsFiles = async (req, res = response) => {
+// funcion para carga de imaganes de prueba no utilizar!!
+/* const uploadsFiles = async (req, res = response) => {
 
     const name = await uploadFileValidation(req.files.file,  undefined, collection);
     res.status(400).json({
         name
     })
-};
+}; */
 
+// funcion para carga de imagenes de manera interna en el servidor no utilizar!!
 /* const updateFile = async (req, res = response) => {
 
     const { id, collection } = req.params;
@@ -63,8 +65,10 @@ const uploadsFiles = async (req, res = response) => {
     res.json(modelo)
 } */
 
-const cloudinaryUpdateFile = async (req, res = response) => {
-
+const cloudinaryUploadFile = async (req, res = response) => {
+    const uid = await req.userAuth;
+    const uid1 = JSON.stringify(uid._id);
+    const uidUpdate = uid1.slice(1, -1);
     const { id, collection } = req.params;
 
     let modelo;
@@ -72,11 +76,19 @@ const cloudinaryUpdateFile = async (req, res = response) => {
     switch (collection) {
         case 'users':
             modelo = await User.findById(id)
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
-                });
+            if (modelo) {
+                const uid2 = JSON.stringify(modelo._id);
+                const uidUpdate2 = uid2.slice(1, -1);
+                if (uidUpdate2 !== uidUpdate) {
+                    return res.status(400).json({
+                        msg: 'La imagen no le pertenece'
+                })
             }
+        }else{
+            res.status(400).json({
+                msg: 'El uid no existe'
+        })
+    }
             break;
         case 'images':
             modelo = await Image.findById(id)
@@ -94,24 +106,35 @@ const cloudinaryUpdateFile = async (req, res = response) => {
     }
 
     // limpieza de archivos anteriores
-    if(modelo.img){
+    if (modelo.img) {
         const nameArr = modelo.img.split('/');
-        const name = nameArr[nameArr.length-1];
+        const name = nameArr[nameArr.length - 1];
         const [public_id] = name.split('.');
         console.log(public_id)
         cloudinary.uploader.destroy(public_id);
+    }
+
+    const { name, tempFilePath } = req.files.file;
+    try {
+        const nameValitation = await uploadFileValidation(name, undefined);
+        if (nameValitation === false) {
+            return res.status(401).json({
+                msg: 'La extensión no esta permitida'
+            });
+        }
+        const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
+        modelo.img = secure_url;
+
+        await modelo.save();
+
+        res.json(modelo)
+    } catch (error) {
+        console.log(error)
+
+    }
 }
 
-    const { tempFilePath } = req.files.file;
-    const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
-    modelo.img = secure_url;
-
-    await modelo.save();
-
-    res.json(modelo)
-}
-
-const getUpload = async (req, res = response) =>{
+const getUpload = async (req, res = response) => {
     const { id, collection } = req.params;
 
     let modelo;
@@ -139,19 +162,16 @@ const getUpload = async (req, res = response) =>{
                 msg: 'Coleccion no incluida, comunicate con el admin'
             });
     }
-    // limpieza de archivos anteriores
-    if(modelo.img){
-        const imgPath = path.join(__dirname, '../uploads/', collection, modelo.img);
-        if (fs.existsSync( imgPath )) {
-             return res.sendFile(imgPath)
-        }
+    // validacion existe img
+    if (modelo.img) {
+        return res.json(modelo);
     }
 
     res.sendFile(noImagePath)
 }
 
 module.exports = {
-    uploadsFiles,
-    cloudinaryUpdateFile,
+    /* uploadsFiles, */
+    cloudinaryUploadFile,
     getUpload
 }

@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 
-const { uploadsFiles, cloudinaryUpdateFile, getUpload } = require('../controllers/uploads');
+const { cloudinaryUploadFile, getUpload } = require('../controllers/uploads');
 const { collectionAllowed } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { validarCampos } = require('../middelwares/validar-campos');
@@ -16,11 +16,6 @@ router.get('/:collection/:id',[
     validarCampos
 ], getUpload);
 
-router.post('/', [
-    validarJWT,
-    verifyUploadFile
-],
-uploadsFiles);
 
 router.put('/:collection/:id',[
     validarJWT,
@@ -28,6 +23,6 @@ router.put('/:collection/:id',[
     check('id','El id no es valido').isMongoId(),
     check('collection').custom( c=> collectionAllowed(c, ['users','images'])),
     validarCampos
-], cloudinaryUpdateFile);
+], cloudinaryUploadFile);
 
 module.exports = router;

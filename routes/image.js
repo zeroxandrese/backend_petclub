@@ -6,6 +6,7 @@ const { imagesPost, imagesDelete, imagesGet, imagesPut } = require('../controlle
 const { findIdImg } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorImg } = require('../helpers/id-validator-img');
+const { verifyUploadFile } = require('../middelwares/validar-archivo');
 
 const router = Router();
 
@@ -24,7 +25,8 @@ router.put('/:id', [
 
 router.post('/', [
     validarJWT,
-    validarCampos
+    verifyUploadFile,
+    validarCampos,
 ], imagesPost);
 
 router.delete('/:id', [

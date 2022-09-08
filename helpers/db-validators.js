@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Pais, Sexo, User } = require('../models/index');
+const { Image, Role, Tipo, Pais, Sexo, User, Comments, Alerts, Like } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -57,6 +57,27 @@ const collectionAllowed = (collection = '', collections = []) => {
     return true;
 };
 
+const findIdCom = async (id = "") => {
+    const missingId = await Comments.findById(id);
+    if (!missingId) {
+        throw new Error('El id del comentario no se encuentra registrado');
+    }
+};
+
+const findIdAlert = async (id = "") => {
+    const missingId = await Alerts.findById(id);
+    if (!missingId) {
+        throw new Error('El id de la alerta no se encuentra registrado');
+    }
+}
+
+const findIdLike = async (id = "") => {
+    const missingId = await Like.findById(id);
+    if (!missingId) {
+        throw new Error('El id del like no se encuentra registrado');
+    }
+}
+
 
 
 module.exports = {
@@ -67,5 +88,8 @@ module.exports = {
     findEmail,
     findId,
     findIdImg,
-    collectionAllowed
+    collectionAllowed,
+    findIdCom,
+    findIdAlert,
+    findIdLike
 }
