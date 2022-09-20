@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const User = require('../models/user')
+const {User, Image} = require('../models/index');
 
 const collectionPermitidas = [
     /*'emails',
@@ -33,6 +33,28 @@ const searchUsuarios = async (term = '', res = response) => {
     });
 }
 
+const searchImages = async (term = '', res = response) => {
+
+    const mongoID = ObjectId.isValid(term);
+
+    if (mongoID) {
+        const image = await Image.findById(term);
+        return res.status(201).json({
+            results: (image) ? [image] : []
+        });
+    }
+
+    const regex = new RegExp( term, 'i' );
+    const image = await Image.find({ 
+        $or: [{ user: regex }],
+        $and: [{ status: true }]
+     });
+
+    res.status(201).json({
+        results: image
+    });
+}
+
 const searchGet = async (req, res = response) => {
 
     const { collection, term } = req.params;
@@ -55,10 +77,10 @@ const searchGet = async (req, res = response) => {
             break;
         case 'sexos':
 
+            break;*/
+        case 'images':
+            searchImages(term, res);
             break;
-        case 'tipos':
-
-            break; */
         case 'users':
             searchUsuarios(term, res);
             break;
