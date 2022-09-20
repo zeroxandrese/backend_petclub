@@ -8,7 +8,8 @@ const collectionPermitidas = [
     'roles',
     'sexos',
     'tipos',*/
-    'users'
+    'users',
+    'images'
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -35,24 +36,15 @@ const searchUsuarios = async (term = '', res = response) => {
 
 const searchImages = async (term = '', res = response) => {
 
-    const mongoID = ObjectId.isValid(term);
-
-    if (mongoID) {
-        const image = await Image.findById(term);
-        return res.status(201).json({
-            results: (image) ? [image] : []
+        const image = await Image.find({ 
+            $or: [{ user: term }],
+            $and: [{ status: true }]
+         });
+    
+        res.status(201).json({
+            results: image
         });
-    }
 
-    const regex = new RegExp( term, 'i' );
-    const image = await Image.find({ 
-        $or: [{ user: regex }],
-        $and: [{ status: true }]
-     });
-
-    res.status(201).json({
-        results: image
-    });
 }
 
 const searchGet = async (req, res = response) => {
