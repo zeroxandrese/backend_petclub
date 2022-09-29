@@ -14,10 +14,6 @@ const SchemaLike = Schema({
    like:{
        type: Number
    },
-   note:{
-    type: String,
-    required: true
-   },
    status:{
        type: Boolean,
        default: true,

@@ -2,21 +2,43 @@ const { response, query } = require('express');
 
 const { Like } = require('../models/index');
 
+const likeGet = async (req, res = response) => {
+    const id = req.params.id;
+    const { limite = 5, desde = 0 } = req.query;
+    const query = { uidImg :id, status: true };
+
+    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
+    const [total, likes] = await Promise.all([
+        Like.count(query),
+        Like.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite))
+    ]);
+    if (total > 0) {
+        return res.status(201).json({
+            total,
+            likes
+        })
+    }
+    res.status(201).json({
+        msg:'Imagen sin likes'
+    })
+};
+
 const likePost = async (req, res = response) => {
 
     const uid = await req.userAuth;
-    const { like, note } = req.body;
+    const { like } = req.body;
     const id = req.params.id;
-    if (!note) {
+    if (!like) {
         return res.status(401).json({
-            msg: 'Necesita enviar una descripcion'
+            msg: 'Necesita enviar una interaccion'
         })
     }
     const data = {
         user: uid._id,
         uidImg: id,
-        like,
-        note
+        like
     }
 
     const likes = new Like(data);
@@ -38,6 +60,7 @@ const likeDelete = async (req, res = response) => {
 };
 
 module.exports = {
+    likeGet,
     likePost,
-    likeDelete,
+    likeDelete
 }

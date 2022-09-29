@@ -5,9 +5,9 @@ const { Alerts } = require('../models/index');
 const alertsPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
-    const { alert } = req.body;
+    const { alert, note } = req.body;
     const id = req.params.id;
-    if (!alert) {
+    if (!note) {
         return res.status(401).json({
             msg: 'Necesita enviar una interacción'
         })
@@ -15,7 +15,8 @@ const alertsPost = async (req, res = response) => {
     const data = {
         user: uid._id,
         uidImg: id,
-        alert
+        alert,
+        note
     }
 
     const alerts = new Alerts(data);

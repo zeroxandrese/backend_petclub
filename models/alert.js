@@ -14,6 +14,10 @@ const SchemaAlerts = Schema({
    alert:{
        type: Number
    },
+   note:{
+    type: String,
+    required: true
+   },
    status:{
        type: Boolean,
        default: true,
