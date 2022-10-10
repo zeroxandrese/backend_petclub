@@ -1,4 +1,4 @@
-const { response, query } = require('express');
+const { response } = require('express');
 
 const { Alerts } = require('../models/index');
 
@@ -23,7 +23,9 @@ const alertsPost = async (req, res = response) => {
 
     await alerts.save();
 
-    res.status(201).json(alerts);
+    res.status(201).json({
+        msg: 'Alerta enviada de manera satisfactoria'
+    });
 };
 
 const alertsDelete = async (req, res = response) => {

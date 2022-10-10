@@ -5,7 +5,7 @@ const { User } = require('../models/index');
 
 
 const usersGet = async (req, res = response) => {
-    //const { id, nombre, apellido } = req.query;
+    //const { id, nombre, apellido } = req.query;.
     const { limite = 5, desde = 0 } = req.query;
     const query = { status: true };
 
@@ -49,7 +49,15 @@ const usersPost = async (req, res = response) => {
 
     await user.save();
 
-    res.status(201).json(user);
+    const userCreated = await User.findOne({ email });
+
+    //Generar JWT
+    const token = await generateJwt( userCreated.id );
+
+    res.status(201).json({
+        user,
+        token
+    });
 };
 
 const usersDelete = async (req, res = response) => {
