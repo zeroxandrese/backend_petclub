@@ -12,6 +12,7 @@ const Image = require('./image');
 const Comments = require('./comments');
 const Alerts = require('./alert');
 const Like = require('./like');
+const CommentsAdmin = require('./commentsAdmin');
 
 module.exports = {
 User,
@@ -23,6 +24,7 @@ Tipo,
 Image,
 Comments,
 Alerts,
-Like
+Like,
+CommentsAdmin
 }
 

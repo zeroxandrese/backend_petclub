@@ -17,6 +17,7 @@ class Server {
         this.commentsPath = '/api/comments';
         this.alertsPath = '/api/alerts';
         this.likePath = '/api/like';
+        this.commentsAdminPath = '/api/commentsAdmin';
 
         // Conectar a base de datos
         this.conectarDB();
@@ -60,6 +61,7 @@ class Server {
         this.app.use(this.commentsPath, require('../routes/comments'));
         this.app.use(this.alertsPath, require('../routes/alerts'));
         this.app.use(this.likePath, require('../routes/like'));
+        this.app.use(this.commentsAdminPath, require('../routes/commentsAdmin'));
     };
 
     listen() {
