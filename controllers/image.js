@@ -7,22 +7,16 @@ const { uploadFileValidation } = require('../helpers/upload-file');
 
 const imagesGet = async (req, res = response) => {
     //const { id, nombre, apellido } = req.query;
-    const { limite = 5, desde = 0 } = req.query;
+    const options = { page: 1, limit: 10 }
     const query = { status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
-    const [total, imagenes] = await Promise.all([
-        Image.count(query),
-        Image.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-
-    res.status(201).json({
-        total,
-        imagenes
-    })
-};
+        await Image.paginate({}, options, (err, imagenes) =>{
+            res.send.status(201)({
+                imagenes
+            })
+        });
+}
 
 const imagesPut = async (req, res = response) => {
     
