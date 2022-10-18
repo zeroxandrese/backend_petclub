@@ -12,7 +12,7 @@ const imagesGet = async (req, res = response) => {
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
         await Image.paginate({}, options, (err, imagenes) =>{
-            res.send.status(201)({
+            res.send({
                 imagenes
             })
         });

@@ -4,25 +4,16 @@ const { Comments } = require('../models/index');
 
 const commentsGet = async (req, res = response) => {
     const id = req.params.id;
-    const { limite = 5, desde = 0 } = req.query;
+    /* const { limite = 5, desde = 0 } = req.query; */
+    const options = { page: 1, limit: 10 };
     const query = { uidImg :id, status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de comentarios
-    const [total, comments] = await Promise.all([
-        Comments.count(query),
-        Comments.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-    if (total > 0) {
-        return res.status(201).json({
-            total,
+    await Comments.paginate({}, options, (err, comments) =>{
+        res.send({
             comments
         })
-    }
-    res.status(201).json({
-        msg:'Imagen sin comentarios'
-    })
+    });
 };
 
 const commentsPut = async (req, res = response) => {

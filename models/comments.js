@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const SchemaComments = Schema({
     user:{
@@ -25,6 +26,8 @@ SchemaComments.methods.toJSON = function(){
     const { __v, _id, ...comments } = this.toObject();
     comments.uid = _id
     return comments;
-}
+};
+
+SchemaComments.plugin(mongoosePaginate);
 
 module.exports = model('Comments', SchemaComments);
