@@ -6,8 +6,8 @@ const { Image } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
 const imagesGet = async (req, res = response) => {
-    //const { id, nombre, apellido } = req.query;
-    const options = { page: 1, limit: 10 }
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 10 }
     const query = { status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
