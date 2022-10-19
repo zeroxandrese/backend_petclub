@@ -9,11 +9,8 @@ const commentsGet = async (req, res = response) => {
     const query = { uidImg :id, status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de comentarios
-    await Comments.paginate({}, options, (err, comments) =>{
-        res.send({
-            comments
-        })
-    });
+    const comments = await Comments.paginate({}, options)
+        res.status(201).json(comments);
 };
 
 const commentsPut = async (req, res = response) => {
