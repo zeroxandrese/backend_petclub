@@ -30,11 +30,7 @@ const SchemaUser = Schema({
     },
     // se calcuaria solicitando la fecha de nacimiento
     edad: {
-<<<<<<< HEAD
         type: Date
-=======
-        type: date,
->>>>>>> 47ae7b7ea81cf5ba411acba41145669bfce75a86
     },
     role: {
         type: String,
@@ -60,11 +56,7 @@ const SchemaUser = Schema({
         default: false
     },
     fechaPerdida:{
-<<<<<<< HEAD
         type: Date
-=======
-        type: date
->>>>>>> 47ae7b7ea81cf5ba411acba41145669bfce75a86
     },
     lugarPerdida:{
         type: String
