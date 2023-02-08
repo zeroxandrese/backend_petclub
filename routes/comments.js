@@ -6,7 +6,7 @@ const { commentsGet,
     commentsPut,
     commentsPost,
     commentsDelete } = require('../controllers/comments');
-const { findIdImg, findIdCom } = require('../helpers/db-validators');
+const { findIdImg, findIdCom, findIdImgCom } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorCom, idValidatorComOwner } = require('../helpers/id-validator-comments');
 
@@ -15,7 +15,7 @@ const router = Router();
 router.get('/:id', [
     validarJWT,
     check('id', 'El id no es valido').isMongoId(),
-    check('id').custom(findIdImg),
+    check('id').custom(findIdImgCom),
     validarCampos
 ], commentsGet);
 

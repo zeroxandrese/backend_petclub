@@ -78,6 +78,13 @@ const findIdLike = async (id = "") => {
     }
 }
 
+const findIdImgCom = async (id = "") => {
+    const missingId = await Image.findOne({id});
+    if (!missingId) {
+        throw new Error('El id no se encuentra registrado');
+    }
+};
+
 
 
 module.exports = {
@@ -91,5 +98,6 @@ module.exports = {
     collectionAllowed,
     findIdCom,
     findIdAlert,
-    findIdLike
+    findIdLike,
+    findIdImgCom
 }
