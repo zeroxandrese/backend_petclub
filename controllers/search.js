@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const {User, Image, Pet} = require('../models/index');
+const { User, Image, Pet } = require('../models/index');
 
 const collectionPermitidas = [
     /*'emails',
@@ -10,7 +10,8 @@ const collectionPermitidas = [
     'petsImg',
     'pets',
     'users',
-    'images'
+    'images',
+    'petsalluser'
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -24,11 +25,11 @@ const searchUsuarios = async (term = '', res = response) => {
         });
     }
 
-    const regex = new RegExp( term, 'i' );
-    const user = await User.find({ 
+    const regex = new RegExp(term, 'i');
+    const user = await User.find({
         $or: [{ nombre: regex }, { email: regex }, { roles: regex }],
         $and: [{ status: true }]
-     });
+    });
 
     res.status(201).json({
         results: user
@@ -37,13 +38,26 @@ const searchUsuarios = async (term = '', res = response) => {
 
 const searchPetsImg = async (term = '', res = response) => {
 
-    const image = await Image.find({ 
+    const image = await Image.find({
         $or: [{ pet: term }],
         $and: [{ status: true }]
-     });
+    });
 
     res.status(201).json({
         results: image
+    });
+
+};
+
+const searchPetsAllUser = async (term = '', res = response) => {
+
+    const pets = await Pet.find({
+        $or: [{ user: term }],
+        $and: [{ status: true }]
+    });
+
+    res.status(201).json({
+        results: pets
     });
 
 };
@@ -59,11 +73,11 @@ const searchPet = async (term = '', res = response) => {
         });
     }
 
-    const regex = new RegExp( term, 'i' );
-    const pet = await Pet.find({ 
+    const regex = new RegExp(term, 'i');
+    const pet = await Pet.find({
         $or: [{ nombre: regex }, { tipo: regex }],
         $and: [{ status: true }]
-     });
+    });
 
     res.status(201).json({
         results: user
@@ -72,14 +86,14 @@ const searchPet = async (term = '', res = response) => {
 
 const searchImages = async (term = '', res = response) => {
 
-        const image = await Image.find({ 
-            $or: [{ user: term }],
-            $and: [{ status: true }]
-         });
-    
-        res.status(201).json({
-            results: image
-        });
+    const image = await Image.find({
+        $or: [{ user: term }],
+        $and: [{ status: true }]
+    });
+
+    res.status(201).json({
+        results: image
+    });
 
 }
 
@@ -94,12 +108,12 @@ const searchGet = async (req, res = response) => {
     }
 
     switch (collection) {
-/*          case 'emails':
-
+        /*          case 'emails':
+        
+                    break;*/
+        case 'petsalluser':
+            searchPetsAllUser(term, res);
             break;
-        case 'pais':
-
-            break; */
         case 'pets':
             searchPet(term, res);
             break;
