@@ -9,11 +9,6 @@ const SchemaUser = Schema({
         type: String,
         required: true
     },
-    // gato, perro, conejo, cerdito, hamster, conejillo de india, pez, ave, reptil, insecto, otro, erizo
-    tipo: {
-        type: String,
-        required: true
-    },
     password: {
         type: String,
         required: true
@@ -50,16 +45,6 @@ const SchemaUser = Schema({
     },
     img: {
         type: String,
-    },
-    perdido:{
-        type: Boolean,
-        default: false
-    },
-    fechaPerdida:{
-        type: Date
-    },
-    lugarPerdida:{
-        type: String
     },
     logoPerfil: {
         type: String,

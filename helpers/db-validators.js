@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Pais, Sexo, User, Comments, Alerts, Like } = require('../models/index');
+const { Image, Role, Tipo, Pais, Sexo, User, Comments, Alerts, Like, Pet } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -85,7 +85,12 @@ const findIdImgCom = async (id = "") => {
     }
 };
 
-
+const findIdPets = async (id = "") => {
+    const missingId = await Pet.findById(id);
+    if (!missingId) {
+        throw new Error('El id no se encuentra registrado');
+    }
+};
 
 module.exports = {
     isRole,
@@ -99,5 +104,6 @@ module.exports = {
     findIdCom,
     findIdAlert,
     findIdLike,
-    findIdImgCom
+    findIdImgCom,
+    findIdPets
 }

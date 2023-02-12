@@ -13,6 +13,7 @@ const Comments = require('./comments');
 const Alerts = require('./alert');
 const Like = require('./like');
 const CommentsAdmin = require('./commentsAdmin');
+const Pet = require('./pet')
 
 module.exports = {
 User,
@@ -25,6 +26,7 @@ Image,
 Comments,
 Alerts,
 Like,
-CommentsAdmin
+CommentsAdmin,
+Pet
 }
 

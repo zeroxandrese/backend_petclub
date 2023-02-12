@@ -1,13 +1,14 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const {User, Image} = require('../models/index');
+const {User, Image, Pet} = require('../models/index');
 
 const collectionPermitidas = [
     /*'emails',
     'pais',
     'roles',
-    'sexos',
-    'tipos',*/
+    'sexos',*/
+    'petsImg',
+    'pets',
     'users',
     'images'
 ]
@@ -25,7 +26,7 @@ const searchUsuarios = async (term = '', res = response) => {
 
     const regex = new RegExp( term, 'i' );
     const user = await User.find({ 
-        $or: [{ nombre: regex }, { email: regex }, { tipo: regex }, { roles: regex }],
+        $or: [{ nombre: regex }, { email: regex }, { roles: regex }],
         $and: [{ status: true }]
      });
 
@@ -33,6 +34,41 @@ const searchUsuarios = async (term = '', res = response) => {
         results: user
     });
 }
+
+const searchPetsImg = async (term = '', res = response) => {
+
+    const image = await Image.find({ 
+        $or: [{ pet: term }],
+        $and: [{ status: true }]
+     });
+
+    res.status(201).json({
+        results: image
+    });
+
+};
+
+const searchPet = async (term = '', res = response) => {
+
+    const mongoID = ObjectId.isValid(term);
+
+    if (mongoID) {
+        const pet = await Pet.findById(term);
+        return res.status(201).json({
+            results: (pet) ? [pet] : []
+        });
+    }
+
+    const regex = new RegExp( term, 'i' );
+    const pet = await Pet.find({ 
+        $or: [{ nombre: regex }, { tipo: regex }],
+        $and: [{ status: true }]
+     });
+
+    res.status(201).json({
+        results: user
+    });
+};
 
 const searchImages = async (term = '', res = response) => {
 
@@ -58,18 +94,18 @@ const searchGet = async (req, res = response) => {
     }
 
     switch (collection) {
-/*         case 'emails':
+/*          case 'emails':
 
             break;
         case 'pais':
 
+            break; */
+        case 'pets':
+            searchPet(term, res);
             break;
-        case 'roles':
-
+        case 'petsImg':
+            searchPetsImg(term, res);
             break;
-        case 'sexos':
-
-            break;*/
         case 'images':
             searchImages(term, res);
             break;

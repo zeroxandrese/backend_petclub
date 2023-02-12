@@ -6,22 +6,13 @@ const { User } = require('../models/index');
 
 
 const usersGet = async (req, res = response) => {
-    //const { id, nombre, apellido } = req.query;.
-    const { limite = 5, desde = 0 } = req.query;
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 10 }
     const query = { status: true };
 
-     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de usuarios
-    const [ total, users ] = await Promise.all([
-        User.count(query),
-        User.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-
-    res.status(201).json({
-        total,
-        users
-    })
+    // se utliza paginate para traer todos los usuarios controlados
+    const users = await User.paginate(query, options)
+    res.status(201).json(users);
 };
 
 const usersPut = async (req, res = response) => {
@@ -41,8 +32,8 @@ const usersPut = async (req, res = response) => {
 
 const usersPost = async (req, res = response) => {
 
-    const { nombre, sexo, tipo, password, email, pais, edad, role, status, google } = req.body;
-    const user = new User({ nombre, sexo, tipo, password, email, pais, edad, role, status, google });
+    const { nombre, sexo, password, email, pais, edad, role, status, google } = req.body;
+    const user = new User({ nombre, sexo, password, email, pais, edad, role, status, google });
 
     //Encriptado del password
     const salt = bcryptjs.genSaltSync();
