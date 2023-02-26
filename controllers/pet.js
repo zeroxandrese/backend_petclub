@@ -25,7 +25,7 @@ const petsGetAllOfUser = async (req, res = response) => {
     const id = req.params.id;
 
     // Se busca al un id de mascota es especifico
-    const pets = await Pet.findOne({id});
+    const pets = await Pet.find({id});
     res.status(201).json(pets);
 };
 
