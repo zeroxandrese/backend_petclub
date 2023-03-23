@@ -42,14 +42,15 @@ const petsPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
 
-    const { nombre, sexo, tipo, edad } = req.body;
+    const { nombre, sexo, tipo, edad, descripcion } = req.body;
 
     const data = {
         user: uid._id,
         nombre,
         sexo,
         tipo,
-        edad
+        edad,
+        descripcion
     };
 
     const pet = new Pet(data);
