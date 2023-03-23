@@ -30,7 +30,6 @@ const imagesPut = async (req, res = response) => {
 const imagesPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
-    const id = req.params.id;
     const { name, tempFilePath } = req.files.file;
     try {
         const nameValitation = await uploadFileValidation(name, undefined);
@@ -43,7 +42,6 @@ const imagesPost = async (req, res = response) => {
         const { descripcion } = req.body;
         const data = {
             user: uid._id,
-            pet: id,
             img: secure_url,
             descripcion
         }

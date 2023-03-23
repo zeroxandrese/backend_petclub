@@ -7,11 +7,6 @@ const SchemaImg = Schema({
         ref: 'User',
         required: true
     },
-    pet:{
-        type: Schema.Types.ObjectId,
-        ref: 'Pet',
-        required: true
-    },
     img:{
         type: String
     },

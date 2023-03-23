@@ -34,6 +34,9 @@ const SchemaPet = Schema({
         type: Boolean,
         default: false
     },
+    img: {
+        type: String,
+    },
     fechaPerdida:{
         type: Date
     },

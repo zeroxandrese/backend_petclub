@@ -7,7 +7,7 @@ const SchemaUser = Schema({
     },
     sexo: {
         type: String,
-        required: true
+        default:"Indefinido"
     },
     password: {
         type: String,

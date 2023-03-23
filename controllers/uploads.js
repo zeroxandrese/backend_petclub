@@ -6,7 +6,7 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
 const { uploadFileValidation } = require('../helpers/upload-file');
-const { User, Image } = require('../models');
+const { User, Image, Pet } = require('../models/index');
 const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
 
 // funcion para carga de imaganes de prueba no utilizar!!
@@ -82,16 +82,24 @@ const cloudinaryUploadFile = async (req, res = response) => {
                 if (uidUpdate2 !== uidUpdate) {
                     return res.status(400).json({
                         msg: 'La imagen no le pertenece'
+                    })
+                }
+            } else {
+                res.status(400).json({
+                    msg: 'El uid no existe'
                 })
             }
-        }else{
-            res.status(400).json({
-                msg: 'El uid no existe'
-        })
-    }
             break;
         case 'images':
             modelo = await Image.findById(id)
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: 'El uuid no existe'
+                });
+            }
+            break;
+        case 'pets':
+            modelo = await Pet.findById(id)
             if (!modelo) {
                 return res.status(400).json({
                     msg: 'El uuid no existe'
@@ -150,6 +158,14 @@ const getUpload = async (req, res = response) => {
             break;
         case 'images':
             modelo = await Image.findById(id)
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: 'El uuid no existe'
+                });
+            }
+            break;
+        case 'pets':
+            modelo = await Pet.findById(id)
             if (!modelo) {
                 return res.status(400).json({
                     msg: 'El uuid no existe'

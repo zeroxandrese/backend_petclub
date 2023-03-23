@@ -12,7 +12,7 @@ const router = Router();
 router.get('/:collection/:id',[
     validarJWT,
     check('id','El id no es valido').isMongoId(),
-    check('collection').custom( c=> collectionAllowed(c, ['users','images'])),
+    check('collection').custom( c=> collectionAllowed(c, ['users','images','pets'])),
     validarCampos
 ], getUpload);
 
@@ -21,7 +21,7 @@ router.put('/:collection/:id',[
     validarJWT,
     verifyUploadFile,
     check('id','El id no es valido').isMongoId(),
-    check('collection').custom( c=> collectionAllowed(c, ['users','images'])),
+    check('collection').custom( c=> collectionAllowed(c, ['users','images','pets'])),
     validarCampos
 ], cloudinaryUploadFile);
 

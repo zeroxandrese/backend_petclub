@@ -3,8 +3,7 @@ const { check } = require('express-validator');
 
 const { validarCampos } = require('../middelwares/validar-campos');
 const { imagesPost, imagesDelete, imagesGet, imagesPut } = require('../controllers/image');
-const { findIdImg, findIdPets } = require('../helpers/db-validators');
-const { idValidatorPet } = require('../helpers/id-validator-pet');
+const { findIdImg } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorImg } = require('../helpers/id-validator-img');
 const { verifyUploadFile } = require('../middelwares/validar-archivo');
@@ -24,11 +23,8 @@ router.put('/:id', [
     validarCampos
 ],imagesPut);
 
-router.post('/:id', [
+router.post('/', [
     validarJWT,
-    /* idValidatorPet, */
-    check('id','El id no es valido').isMongoId(),
-    check('id').custom(findIdPets),
     verifyUploadFile,
     validarCampos,
 ], imagesPost);
