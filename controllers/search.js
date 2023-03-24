@@ -3,10 +3,10 @@ const { ObjectId } = require('mongoose').Types;
 const { User, Image, Pet } = require('../models/index');
 
 const collectionPermitidas = [
-    /*'emails',
+    'emails',
     'pais',
     'roles',
-    'sexos',*/
+    'sexos',
     'petsImg',
     'pets',
     'users',
@@ -45,6 +45,19 @@ const searchPetsImg = async (term = '', res = response) => {
 
     res.status(201).json({
         results: image
+    });
+
+};
+
+const searchEmailUser = async (term = '', res = response) => {
+
+    const user = await User.findOne({
+        $or: [{ email: term}],
+        $and: [{ status: true }]
+    });
+
+    res.status(201).json({
+        results: user
     });
 
 };
@@ -108,9 +121,9 @@ const searchGet = async (req, res = response) => {
     }
 
     switch (collection) {
-        /*          case 'emails':
-        
-                    break;*/
+                case 'emails':
+                    searchEmailUser(term, res)
+                    break;
         case 'petsalluser':
             searchPetsAllUser(term, res);
             break;
