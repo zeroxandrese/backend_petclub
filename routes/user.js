@@ -24,11 +24,11 @@ router.put('/:id', [
 
 router.post('/', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('sexo').custom(isSexo),
+/*     check('sexo').custom(isSexo), */
     check('password', 'El password debe de tener al menos 6 digitos').isLength({ min: 6 }),
     check('email', 'El email no es valido').isEmail(),
     check('email').custom( findEmail ),
-    check('pais').custom(isPais),
+/*     check('pais').custom(isPais), */
     check('role').custom(isRole),
     validarCampos
 ], usersPost);

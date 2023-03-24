@@ -20,8 +20,7 @@ const SchemaUser = Schema({
     },
     // paises nicho USA-LATINOAMERICA, MEXICO, CENTRO-AMERICA, COLOMBIA, PERU, VENEZUELA, CHILE, ARGENTINA, PARAGUAY, URUAGUAY, ECUADOR, BOLIVAR, BRASIL
     pais: {
-        type: String,
-        required: true
+        type: String
     },
     // se calcuaria solicitando la fecha de nacimiento
     edad: {
