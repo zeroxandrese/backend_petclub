@@ -7,7 +7,7 @@ const SchemaUser = Schema({
     },
     sexo: {
         type: String,
-        default:"Indefinido"
+        default:"Otro"
     },
     password: {
         type: String,
@@ -18,9 +18,11 @@ const SchemaUser = Schema({
         required: true,
         unique: true
     },
-    // paises nicho USA-LATINOAMERICA, MEXICO, CENTRO-AMERICA, COLOMBIA, PERU, VENEZUELA, CHILE, ARGENTINA, PARAGUAY, URUAGUAY, ECUADOR, BOLIVAR, BRASIL
-    pais: {
-        type: String
+    latitude: {
+        type: Number
+    },
+    longitude: {
+        type: Number
     },
     // se calcuaria solicitando la fecha de nacimiento
     edad: {

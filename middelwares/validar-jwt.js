@@ -35,6 +35,8 @@ const validarJWT = (req = request, res = response, next) =>{
 
         req.userAuth = userAuth;
 
+        console.log(req.userAuth.uid)
+
         next();
     } catch (error) {
         console.log(error)

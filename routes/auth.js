@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 
 
 const { login } = require('../controllers/auth');
+const { validarJWT } = require('../middelwares/validar-jwt');
 const { validarCampos } = require('../middelwares/validar-campos');
 
 

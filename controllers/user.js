@@ -32,8 +32,8 @@ const usersPut = async (req, res = response) => {
 
 const usersPost = async (req, res = response) => {
 
-    const { nombre, sexo, password, email, pais, edad, role, status, google } = req.body;
-    const user = new User({ nombre, sexo, password, email, pais, edad, role, status, google });
+    const { nombre, sexo, password, email, latitude, longitude, edad, role, status, google } = req.body;
+    const user = new User({ nombre, sexo, password, email, latitude, longitude, edad, role, status, google });
 
     //Encriptado del password
     const salt = bcryptjs.genSaltSync();
@@ -45,6 +45,8 @@ const usersPost = async (req, res = response) => {
 
     //Generar JWT
     const token = await generateJwt( userCreated.id );
+
+    localStorage.setItem('token',token);
 
     res.status(201).json({
         user,

@@ -21,7 +21,11 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.2",
     "mongoose-paginate-v2": "^1.7.1",
-    "socket.io": "^4.5.1",
+    "socket.io": "^4.6.1",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
   }
 }
