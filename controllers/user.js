@@ -46,8 +46,6 @@ const usersPost = async (req, res = response) => {
     //Generar JWT
     const token = await generateJwt( userCreated.id );
 
-    localStorage.setItem('token',token);
-
     res.status(201).json({
         user,
         token
