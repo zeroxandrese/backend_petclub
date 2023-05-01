@@ -102,7 +102,6 @@ const findIdPets = async (id = "") => {
 module.exports = {
     isRole,
     isTipo,
-    isPais,
     isSexo,
     findEmail,
     findId,
