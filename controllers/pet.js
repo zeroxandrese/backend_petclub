@@ -42,7 +42,7 @@ const petsPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
 
-    const { nombre, sexo, tipo, edad, descripcion } = req.body;
+    const { nombre, sexo, tipo, raza, edad, descripcion } = req.body;
 
     const data = {
         user: uid._id,
@@ -50,7 +50,8 @@ const petsPost = async (req, res = response) => {
         sexo,
         tipo,
         edad,
-        descripcion
+        descripcion,
+        raza
     };
 
     const pet = new Pet(data);

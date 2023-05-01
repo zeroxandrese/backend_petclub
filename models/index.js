@@ -14,6 +14,7 @@ const Alerts = require('./alert');
 const Like = require('./like');
 const CommentsAdmin = require('./commentsAdmin');
 const Pet = require('./pet')
+const Raza = require('./raza')
 
 module.exports = {
 User,
@@ -27,6 +28,7 @@ Comments,
 Alerts,
 Like,
 CommentsAdmin,
-Pet
+Pet,
+Raza
 }
 

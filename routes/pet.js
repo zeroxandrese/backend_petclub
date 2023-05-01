@@ -3,7 +3,7 @@ const { check } = require('express-validator');
 
 const { validarCampos } = require('../middelwares/validar-campos');
 const { petsGet, petsPut, petsPost, petsDelete, petsGetAllOfUser, petsGetOneOfUser } = require('../controllers/pet');
-const { isTipo, isSexo, findIdPets, findId } = require('../helpers/db-validators');
+const { isTipo, isSexo, isRaza, findIdPets, findId } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorPet } = require('../helpers/id-validator-pet');
 
@@ -39,7 +39,7 @@ router.put('/:id', [
 router.post('/', [
     validarJWT,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('sexo').custom(isSexo),
+    check('raza').custom(isRaza),
     check('tipo').custom(isTipo),
     validarCampos
 ], petsPost);

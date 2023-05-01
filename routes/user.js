@@ -3,7 +3,7 @@ const { check } = require('express-validator');
 
 const { validarCampos } = require('../middelwares/validar-campos');
 const { usersGet, usersPut, usersPost, usersDelete } = require('../controllers/user');
-const { isRole, isPais, isSexo, findEmail, findId } = require('../helpers/db-validators');
+const { isRole, isSexo, findEmail, findId } = require('../helpers/db-validators');
 const { idValidator } = require('../helpers/id-validator');
 const { validarJWT } = require('../middelwares/validar-jwt');
 
@@ -28,7 +28,6 @@ router.post('/', [
     check('password', 'El password debe de tener al menos 6 digitos').isLength({ min: 6 }),
     check('email', 'El email no es valido').isEmail(),
     check('email').custom( findEmail ),
-/*     check('pais').custom(isPais), */
     check('role').custom(isRole),
     validarCampos
 ], usersPost);

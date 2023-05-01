@@ -11,8 +11,7 @@ const SchemaPet = Schema({
         required: true
     },
     sexo: {
-        type: String,
-        required: true
+        type: String
     },
     // gato, perro, conejo, cerdito, hamster, conejillo de india, pez, ave, reptil, insecto, otro, erizo
     tipo: {
@@ -27,6 +26,10 @@ const SchemaPet = Schema({
         type: Boolean,
         default: true
     },
+    raza: {
+        type:String,
+        default:"Otro"
+    },
     descripcion: {
         type: String
     },
@@ -40,8 +43,11 @@ const SchemaPet = Schema({
     fechaPerdida:{
         type: Date
     },
-    lugarPerdida:{
-        type: String
+    longitudePerdida:{
+        type: Number
+    },
+    lantitudePerdida:{
+        type: Number
     },
     created:{
         type: Date,

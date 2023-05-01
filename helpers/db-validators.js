@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Pais, Sexo, User, Comments, Alerts, Like, Pet } = require('../models/index');
+const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -14,17 +14,24 @@ const isTipo = async (tipo = "") => {
     }
 };
 
-const isPais = async (pais = "") => {
+/* const isPais = async (pais = "") => {
     const missingPais = await Pais.findOne({ pais });
     if (!missingPais) {
         throw new Error('El pais no se encuentra definido');
     }
-};
+}; */
 
 const isSexo = async (sexo = "") => {
     const missingSexo = await Sexo.findOne({ sexo });
     if (!missingSexo) {
         throw new Error('El sexo no se encuentra definido');
+    }
+};
+
+const isRaza = async (raza = "") => {
+    const missingSexo = await Raza.findOne({ raza });
+    if (!missingSexo) {
+        throw new Error('La raza no se encuentra definida');
     }
 };
 
@@ -105,5 +112,6 @@ module.exports = {
     findIdAlert,
     findIdLike,
     findIdImgCom,
-    findIdPets
+    findIdPets,
+    isRaza
 }
