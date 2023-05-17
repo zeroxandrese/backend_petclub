@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet } = require('../models/index');
+const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -56,6 +56,13 @@ const findIdImg = async (id = "") => {
     }
 };
 
+const findIdReport = async (id = "") => {
+    const missingId = await Report.findById(id);
+    if (!missingId) {
+        throw new Error('El id del reporte no se encuentra registrado');
+    }
+}
+
 const collectionAllowed = (collection = '', collections = []) => {
     const include = collections.includes(collection);
     if (!include) {
@@ -112,5 +119,6 @@ module.exports = {
     findIdLike,
     findIdImgCom,
     findIdPets,
-    isRaza
+    isRaza,
+    findIdReport
 }
