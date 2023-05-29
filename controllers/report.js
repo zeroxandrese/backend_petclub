@@ -14,7 +14,7 @@ const reportPost = async (req, res = response) => {
     }
     const data = {
         user: uid._id,
-        uidReport: id,
+        uidUserReport: id,
         note
     }
 
