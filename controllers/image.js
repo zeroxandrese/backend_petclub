@@ -32,28 +32,29 @@ const imagesPost = async (req, res = response) => {
     const uid = await req.userAuth;
     const { name, tempFilePath } = req.files.file;
     try {
-        const nameValitation = await uploadFileValidation(name, undefined);
-    if (nameValitation === false) {
-        return res.status(400).json({
-            msg:'La extensión no esta permitida'
-        })
-    }
-        const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
-        const { descripcion } = req.body;
-        const data = {
-            user: uid._id,
-            img: secure_url,
-            descripcion
+        const nameValidation = await uploadFileValidation(name, undefined);
+        if (nameValidation === false) {
+          return res.status(400).json({
+            msg: 'La extensión no está permitida',
+          });
         }
-
+    
+        const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
+        const { descripcion } = JSON.parse(req.body.data);
+    
+        const data = {
+          user: uid._id,
+          img: secure_url,
+          descripcion,
+        };
+    
         const image = new Image(data);
-
         await image.save();
-
+    
         res.status(201).json(image);
-    } catch (error) {
-        console.log(error)
-    }
+      } catch (error) {
+        console.log(error);
+      }
     
 };
 
