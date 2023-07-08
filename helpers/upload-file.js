@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-const uploadFileValidation = async(files, extAllowed = ['png', 'jpg', 'jpeg', 'gif']) => {
+const uploadFileValidation = async(files, extAllowed = ['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov']) => {
 
     try {
         const shortFileName = files.split('.')
@@ -8,7 +8,7 @@ const uploadFileValidation = async(files, extAllowed = ['png', 'jpg', 'jpeg', 'g
         if (!extAllowed.includes(extFile)) {
             return false;
        }
-       return true;
+       return extFile;
     } catch (error) {
         console.log(error)
     }
