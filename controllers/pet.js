@@ -3,6 +3,7 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
 const { Pet } = require('../models/index');
+const { uploadFileValidation } = require('../helpers/upload-file');
 
 
 const petsGet = async (req, res = response) => {
