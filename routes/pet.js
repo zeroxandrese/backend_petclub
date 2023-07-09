@@ -6,6 +6,7 @@ const { petsGet, petsPut, petsPost, petsDelete, petsGetAllOfUser, petsGetOneOfUs
 const { isTipo, isSexo, isRaza, findIdPets, findId } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorPet } = require('../helpers/id-validator-pet');
+const { verifyUploadFile } = require('../middelwares/validar-archivo');
 
 const router = Router();
 
@@ -38,6 +39,7 @@ router.put('/:id', [
 
 router.post('/', [
     validarJWT,
+    verifyUploadFile,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('raza').custom(isRaza),
     check('tipo').custom(isTipo),
