@@ -40,9 +40,9 @@ router.put('/:id', [
 router.post('/', [
     validarJWT,
     verifyUploadFile,
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+/*     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('raza').custom(isRaza),
-    check('tipo').custom(isTipo),
+    check('tipo').custom(isTipo), */
     validarCampos
 ], petsPost);
 
