@@ -1,4 +1,6 @@
 const { response, query } = require('express');
+const cloudinary = require('cloudinary').v2;
+cloudinary.config(process.env.CLOUDINARY_URL);
 
 const { Pet } = require('../models/index');
 
@@ -25,7 +27,7 @@ const petsGetAllOfUser = async (req, res = response) => {
     const id = req.params.id;
 
     // Se busca al un id de mascota es especifico
-    const pets = await Pet.find({id});
+    const pets = await Pet.find({ id });
     res.status(201).json(pets);
 };
 
@@ -41,26 +43,40 @@ const petsPut = async (req, res = response) => {
 const petsPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
+    const { name, tempFilePath } = req.files.file;
+    try {
+        const nameValidation = await uploadFileValidation(name, undefined);
 
-    const { nombre, sexo, tipo, raza, edad, descripcion } = req.body;
+        if (nameValidation === false) {
+            return res.status(400).json({
+                msg: 'La extensión no está permitida',
+            });
+        }
 
-    const data = {
-        user: uid._id,
-        nombre,
-        sexo,
-        tipo,
-        edad,
-        descripcion,
-        raza
-    };
+        const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
 
-    const pet = new Pet(data);
+        const data = {
+            user: uid._id,
+            img: secure_url,
+            nombre: req.body.data ? JSON.parse(req.body.data).nombre : '',
+            sexo: req.body.data ? JSON.parse(req.body.data).sexo : '',
+            tipo: req.body.data ? JSON.parse(req.body.data).tipo : '',
+            edad: req.body.data ? JSON.parse(req.body.data).edad : '',
+            descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+            raza: req.body.data ? JSON.parse(req.body.data).raza : ''
+        };
 
-    await pet.save();
+        const pet = new Pet(data);
 
-    res.status(201).json({
-        pet
-    });
+        await pet.save();
+
+        res.status(201).json({
+            pet
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const petsDelete = async (req, res = response) => {
@@ -69,7 +85,7 @@ const petsDelete = async (req, res = response) => {
     //const usuario = await User.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const mascota = await Pet.findByIdAndUpdate( id, { status: false });
+    const mascota = await Pet.findByIdAndUpdate(id, { status: false });
 
     res.status(201).json({ mascota });
 };
