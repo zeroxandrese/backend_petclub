@@ -56,6 +56,8 @@ const petsPost = async (req, res = response) => {
 
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
 
+        console.log(req.body.data);
+
         const data = {
             user: uid._id,
             img: secure_url,
