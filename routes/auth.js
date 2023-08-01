@@ -2,8 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 
 
-const { login } = require('../controllers/auth');
-const { validarJWT } = require('../middelwares/validar-jwt');
+const { login, googleLogin } = require('../controllers/auth');
 const { validarCampos } = require('../middelwares/validar-campos');
 
 
@@ -14,5 +13,8 @@ router.post('/login',[
     check('password', 'El password debe de tener al menos 6 digitos').not().isEmpty(),
     validarCampos
 ] , login);
+
+router.post('/login/google',[
+] , googleLogin);
 
 module.exports = router;

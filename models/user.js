@@ -53,7 +53,11 @@ const SchemaUser = Schema({
     created:{
         type: Date,
         default: Date.now
-    }
+    },
+    googleUserId: {
+        type: String,
+        default: null,
+      }
 });
 
 SchemaUser.methods.toJSON = function(){
