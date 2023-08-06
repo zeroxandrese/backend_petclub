@@ -118,7 +118,6 @@ const cloudinaryUploadFile = async (req, res = response) => {
         const nameArr = modelo.img.split('/');
         const name = nameArr[nameArr.length - 1];
         const [public_id] = name.split('.');
-        console.log(public_id)
         cloudinary.uploader.destroy(public_id);
     }
 
@@ -133,9 +132,9 @@ const cloudinaryUploadFile = async (req, res = response) => {
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
         modelo.img = secure_url;
 
-        await modelo.save();
+        const modeloFinal = await modelo.findByIdAndUpdate(id, modelo.img);
 
-        res.json(modelo)
+        res.json(modeloFinal)
     } catch (error) {
         console.log(error)
 
