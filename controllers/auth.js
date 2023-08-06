@@ -51,17 +51,15 @@ const login = async (req, res = response) => {
 const googleLogin = async (req, res) => {
     const { googleToken } = req.body;
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
-    console.log('googleClientId:', googleClientId);
-    console.log('googleToken:', googleToken);
+
     try {
-        console.log('entro al try');
         // Verificar el token de Google usando la librería google-auth-library
         const client = new OAuth2Client(googleClientId);
         const ticket = await client.verifyIdToken({
             idToken: googleToken,
             audience: googleClientId
         });
-        console.log('paso el ticket');
+
         const payload = ticket.getPayload();
         const googleUserId = payload.sub;
         // Verificar si el usuario ya está registrado en tu base de datos
