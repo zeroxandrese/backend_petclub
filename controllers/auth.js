@@ -63,7 +63,7 @@ const googleLogin = async (req, res) => {
         const payload = ticket.getPayload();
         const googleUserId = payload.sub;
         // Verificar si el usuario ya está registrado en tu base de datos
-        let user = await User.findOne({ googleUserId });
+        let user = await User.findOne({ email: payload.email });
 
         //Creacion del usuario si la informacion no existe
         if (!user) {
