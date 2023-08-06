@@ -132,7 +132,7 @@ const cloudinaryUploadFile = async (req, res = response) => {
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
         modelo.img = secure_url;
 
-        const modeloFinal = await modelo.findByIdAndUpdate(id, modelo.img);
+        const modeloFinal = await modelo.findByIdAndUpdate(id, modelo );
 
         res.json(modeloFinal)
     } catch (error) {
