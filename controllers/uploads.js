@@ -66,9 +66,7 @@ const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
 } */
 
 const cloudinaryUploadFile = async (req, res = response) => {
-    const uid = await req.userAuth;
-    const uid1 = JSON.stringify(uid._id);
-    const uidUpdate = uid1.slice(1, -1);
+    const uid1 = await req.userAuth._id;
     const { id, collection } = req.params;
 
     let modelo;
@@ -77,9 +75,8 @@ const cloudinaryUploadFile = async (req, res = response) => {
         case 'users':
             modelo = await User.findById(id)
             if (modelo) {
-                const uid2 = JSON.stringify(modelo._id);
-                const uidUpdate2 = uid2.slice(1, -1);
-                if (uidUpdate2 !== uidUpdate) {
+                const uid2 = modelo._id.toString();
+                if (uid2 !== uid1) {
                     return res.status(400).json({
                         msg: 'La imagen no le pertenece'
                     })
@@ -132,7 +129,7 @@ const cloudinaryUploadFile = async (req, res = response) => {
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
         modelo.img = secure_url;
 
-        const modeloFinal = await modelo.findByIdAndUpdate(id, modelo );
+        await modelo.save();
 
         res.json(modeloFinal)
     } catch (error) {
