@@ -50,7 +50,6 @@ const login = async (req, res = response) => {
 
 const googleLogin = async (req, res) => {
     const { googleToken } = req.body;
-    console.log(googleToken+'token');
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
     try {
@@ -58,11 +57,9 @@ const googleLogin = async (req, res) => {
         const client = new OAuth2Client(googleClientId);
         const ticket = await client.verifyIdToken({
             idToken: googleToken,
-            audience: googleClientId,
+            audience: googleClientId
         });
-        console.log('paso por aqui adentro')
         const payload = ticket.getPayload();
-        console.log(payload+'payload')
         const googleUserId = payload.sub;
         // Verificar si el usuario ya está registrado en tu base de datos
         let user = await User.findOne({ googleUserId });

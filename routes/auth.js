@@ -15,6 +15,8 @@ router.post('/login',[
 ] , login);
 
 router.post('/login/google',[
+    check('googleToken','El Token es obligatorio').not().isEmpty(),
+    validarCampos
 ] , googleLogin);
 
 module.exports = router;
