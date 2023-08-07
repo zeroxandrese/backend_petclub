@@ -16,22 +16,15 @@ const usersGet = async (req, res = response) => {
 };
 
 const usersPut = async (req, res = response) => {
-    const uid = await req.userAuth;
-    const uid2 = req.params.id;
+    const uid1 = req.params.id;
     const { password, google, correo, ...user } = req.body;
-    //Validacion clave contra la base de datos
-    if (uid2 !== uid) {
-        return res.status(400).json({
-            msg: 'La modificación no corresponde'
-        })
-    }
 
     if (password) {
         const salt = bcryptjs.genSaltSync();
         user.password = bcryptjs.hashSync(password, salt);
     }
 
-    const usuario = await User.findByIdAndUpdate(uid, user);
+    const usuario = await User.findByIdAndUpdate(uid1, user);
 
     res.status(201).json(usuario);
 };
