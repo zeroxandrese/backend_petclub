@@ -18,7 +18,7 @@ const usersGet = async (req, res = response) => {
 const usersPut = async (req, res = response) => {
     console.log('entro');
     const uid1 = await req.userAuth._id;
-    console.log(uid1)
+    console.log(req.userAuth._id)
     const uid2 = req.params.id;
     const { password, google, correo, ...user } = req.body;
     console.log(uid2);

@@ -78,7 +78,7 @@ const googleLogin = async (req, res) => {
             await user.save();
         };
 
-        const userId = user.uid;
+        const userId = user._id;
 
         //Generar JWT
         const token = await generateJwt(userId);
