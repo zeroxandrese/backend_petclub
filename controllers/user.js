@@ -19,7 +19,8 @@ const usersPut = async (req, res = response) => {
     const uid1 = await req.userAuth._id;
     const uid2 = req.params.id;
     const { password, google, correo, ...user } = req.body;
-
+    console.log(uid1);
+    console.log(uid2);
     //Validacion clave contra la base de datos
     if (uid2 !== uid1) {
         return res.status(400).json({
@@ -33,7 +34,7 @@ const usersPut = async (req, res = response) => {
     }
 
     const usuario = await User.findByIdAndUpdate(uid1, user);
-
+    console.log(usuario)
     res.status(201).json(usuario);
 };
 
@@ -51,7 +52,7 @@ const usersPost = async (req, res = response) => {
     const userCreated = await User.findOne({ email });
 
     //Generar JWT
-    const token = await generateJwt( userCreated.id );
+    const token = await generateJwt(userCreated.id);
 
     res.status(201).json({
         user,
@@ -65,7 +66,7 @@ const usersDelete = async (req, res = response) => {
     //const usuario = await User.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const usuario = await User.findByIdAndUpdate( id, { status: false });
+    const usuario = await User.findByIdAndUpdate(id, { status: false });
 
     res.status(201).json({ usuario });
 };
