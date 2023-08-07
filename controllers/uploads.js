@@ -66,7 +66,6 @@ const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
 } */
 
 const cloudinaryUploadFile = async (req, res = response) => {
-    const uid1 = await req.userAuth._id;
     const { id, collection } = req.params;
 
     let modelo;
@@ -74,17 +73,10 @@ const cloudinaryUploadFile = async (req, res = response) => {
     switch (collection) {
         case 'users':
             modelo = await User.findById(id)
-            if (modelo) {
-                const uid2 = modelo._id.toString();
-                if (uid2 !== uid1) {
-                    return res.status(400).json({
-                        msg: 'La imagen no le pertenece'
-                    })
-                }
-            } else {
-                res.status(400).json({
-                    msg: 'El uid no existe'
-                })
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: 'El uuid no existe'
+                });
             }
             break;
         case 'images':
