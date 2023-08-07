@@ -53,6 +53,7 @@ const usersPost = async (req, res = response) => {
     const userCreated = await User.findOne({ email });
 
     //Generar JWT
+    console.log(userCreated.id);
     const token = await generateJwt(userCreated.id);
 
     res.status(201).json({
