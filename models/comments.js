@@ -19,7 +19,11 @@ const SchemaComments = Schema({
        type: Boolean,
        default: true,
        required: true
-   }
+   },
+   nombreUserSender: {
+    type: String,
+    required: true
+}
 });
 
 SchemaComments.methods.toJSON = function(){
