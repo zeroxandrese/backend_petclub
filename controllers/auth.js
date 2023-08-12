@@ -8,10 +8,11 @@ const { generateJwt } = require('../helpers/generate-jwt');
 
 const verifyToken = async (req, res = response) => {
 
+    const uid = await req.userAuth;
+
     try {
         res.status(201).json({
-            user,
-            token
+            user: uid
         });
 
     } catch (error) {
