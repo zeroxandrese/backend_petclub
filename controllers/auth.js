@@ -6,6 +6,22 @@ require('dotenv').config();
 const User = require('../models/user');
 const { generateJwt } = require('../helpers/generate-jwt');
 
+const verifyToken = async (req, res = response) => {
+
+    try {
+        res.status(201).json({
+            user,
+            token
+        });
+
+    } catch (error) {
+        console.log(err)
+        res.status(500).json({
+            msg: 'Algo salio mal, contacte con el administrador'
+        })
+    }
+};
+
 
 const login = async (req, res = response) => {
 
@@ -96,5 +112,6 @@ const googleLogin = async (req, res) => {
 
 module.exports = {
     login,
-    googleLogin
+    googleLogin,
+    verifyToken
 }
