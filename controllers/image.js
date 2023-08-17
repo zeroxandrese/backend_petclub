@@ -62,7 +62,6 @@ const imagesPost = async (req, res = response) => {
       const videoUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         resource_type: 'video',
         chunk_size: 6000000,
-        width: '100%',
         height: 240.99,
         crop: 'fill',
         gravity: 'center',
