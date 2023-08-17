@@ -66,7 +66,7 @@ const imagesPost = async (req, res = response) => {
         crop: 'fill',
         gravity: 'center',
         eager: [
-          { format: 'jpg', transformation: [{ width: 500, height: 500, crop: 'fill' }] }
+          { format: 'jpg', transformation: [{ width: 500, height: 500, crop: 'limit' }] }
         ],
       });
 
