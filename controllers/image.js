@@ -62,8 +62,8 @@ const imagesPost = async (req, res = response) => {
       const videoUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         resource_type: 'video',
         chunk_size: 6000000,
-        width: 640,
-        height: 360,
+        width: '100%',
+        height: 240.99,
         crop: 'fill',
         gravity: 'center',
         eager: [
@@ -85,6 +85,7 @@ const imagesPost = async (req, res = response) => {
       // Subir imagen a Cloudinary con transformaciones
       const imageUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         eager: [
+          { width: '100%', height: 240.99, crop: 'fill' },
           { format: 'jpg', transformation: [{ width: 500, height: 500, crop: 'fill' }] }
         ],
       });
