@@ -63,7 +63,7 @@ const imagesPost = async (req, res = response) => {
         resource_type: 'video',
         chunk_size: 6000000,
         eager: [
-          { format: 'jpg', transformation: [{ width: 1000, height: 240.99, crop: 'scale'}] }
+          { format: 'jpg', transformation: [{ height: 240.99, crop: 'fit'}] }
         ]
       });
 
