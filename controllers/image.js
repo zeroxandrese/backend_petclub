@@ -81,8 +81,7 @@ const imagesPost = async (req, res = response) => {
       // Subir imagen a Cloudinary con transformaciones
       const imageUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         eager: [
-          { width: 1000, height: 360, crop: 'fill' },
-          { format: 'jpg', transformation: [{ width: 500, height: 360, crop: 'fill' }] }
+          { width: 1000, height: 360, crop: 'fill' }
         ],
       });
 
