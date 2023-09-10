@@ -42,6 +42,20 @@ const imagesPost = async (req, res = response) => {
 
     const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024;
 
+    const commonTransformation = [
+      { width: 1000, height: 360, crop: "scale" }
+    ];
+
+    const commonTransformationLitt = [
+      {
+        format: 'jpg',
+        transformation: [
+          { width: 104, height: 104, crop: 'scale' },
+          { height: 360, crop: 'scale' }
+        ]
+      }
+    ];
+
     function getFileSize(filePath) {
       const stats = fs.statSync(filePath);
       return stats.size;
@@ -62,9 +76,7 @@ const imagesPost = async (req, res = response) => {
       const videoUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         resource_type: 'video',
         chunk_size: 6000000,
-        eager: [
-          { format: 'jpg', transformation: [{ height: 360, crop: 'fill'}] }
-        ]
+        eager: commonTransformationLitt
       });
 
       const data = {
@@ -80,9 +92,7 @@ const imagesPost = async (req, res = response) => {
     } else {
       // Subir imagen a Cloudinary con transformaciones
       const imageUploadResult = await cloudinary.uploader.upload(tempFilePath, {
-        eager: [
-          { width: 1000, height: 360, crop: 'fill' }
-        ],
+        eager: commonTransformation
       });
 
       const data = {
