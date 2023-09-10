@@ -56,7 +56,7 @@ const imagesPost = async (req, res = response) => {
       {
         format: 'mp4',
         transformation: [
-          { height: 360, crop: 'scale' },
+          { width: 1000, height: 360, crop: 'scale' },
           {quality: "auto"}
         ]
       }
