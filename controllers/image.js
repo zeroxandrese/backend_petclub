@@ -47,17 +47,11 @@ const imagesPost = async (req, res = response) => {
     ];
 
     const commonTransformationLitt = [
+      { width: 1000, height: 360, crop: "scale" },
       {
         format: 'jpg',
         transformation: [
           { width: 104, height: 104, crop: 'scale' },
-        ]
-      },
-      {
-        format: 'mp4',
-        transformation: [
-          { width: 1000, height: 360, crop: 'scale' },
-          {quality: "auto"}
         ]
       }
     ];
@@ -84,10 +78,10 @@ const imagesPost = async (req, res = response) => {
         chunk_size: 6000000,
         eager: commonTransformationLitt
       });
-
+console.log(videoUploadResult);
       const data = {
         user: uid._id,
-        img: videoUploadResult.eager[1].secure_url,
+        img: videoUploadResult.secure_url,
         descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
       };
 
