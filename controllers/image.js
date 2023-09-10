@@ -94,7 +94,7 @@ const imagesPost = async (req, res = response) => {
       const imageUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         eager: commonTransformation
       });
-
+      console.log(videoUploadResult);
       const data = {
         user: uid._id,
         img: imageUploadResult.secure_url,
