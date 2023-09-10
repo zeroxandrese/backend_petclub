@@ -43,11 +43,13 @@ const imagesPost = async (req, res = response) => {
     const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024;
 
     const commonTransformation = [
-      { width: 1000, height: 506, crop: "scale" }
+      { width: 1000, height: 506, crop: "scale" },
+      { quality: "auto" },
     ];
 
     const commonTransformationLitt = [
       { width: 1000, height: 506, crop: "scale" },
+      { quality: "auto" },
       {
         format: 'jpg',
         transformation: [
@@ -78,7 +80,7 @@ const imagesPost = async (req, res = response) => {
         chunk_size: 6000000,
         eager: commonTransformationLitt
       });
-      
+
       const data = {
         user: uid._id,
         img: videoUploadResult.secure_url,
