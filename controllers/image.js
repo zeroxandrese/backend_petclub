@@ -51,7 +51,13 @@ const imagesPost = async (req, res = response) => {
         format: 'jpg',
         transformation: [
           { width: 104, height: 104, crop: 'scale' },
-          { height: 360, crop: 'scale' }
+        ]
+      },
+      {
+        format: 'mp4',
+        transformation: [
+          { width: 1000, height: 360, crop: 'scale' },
+          {quality: "auto"}
         ]
       }
     ];
@@ -78,7 +84,7 @@ const imagesPost = async (req, res = response) => {
         chunk_size: 6000000,
         eager: commonTransformationLitt
       });
-      console.log(videoUploadResult);
+console.log(videoUploadResult);
       const data = {
         user: uid._id,
         img: videoUploadResult.secure_url,
@@ -94,7 +100,7 @@ const imagesPost = async (req, res = response) => {
       const imageUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         eager: commonTransformation
       });
-      console.log(videoUploadResult);
+
       const data = {
         user: uid._id,
         img: imageUploadResult.secure_url,
