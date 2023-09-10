@@ -84,10 +84,10 @@ const imagesPost = async (req, res = response) => {
         chunk_size: 6000000,
         eager: commonTransformationLitt
       });
-console.log(videoUploadResult);
+
       const data = {
         user: uid._id,
-        img: videoUploadResult.secure_url,
+        img: videoUploadResult.eager[1].secure_url,
         descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
       };
 
