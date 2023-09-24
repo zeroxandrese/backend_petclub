@@ -3,7 +3,7 @@ const { response } = require("express");
 const { Image } = require('../models/index');
 
 
-const idValidatorImg = async ( req, res = response, next) =>{
+const idValidatorImg = async (req, res = response, next) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     const validacionIdImg = await Image.findById(id);
@@ -16,25 +16,25 @@ const idValidatorImg = async ( req, res = response, next) =>{
 
     if (!req.userAuth) {
         return res.status(500).json({
-            msg:'Se intenta validar el id sin validar token'
+            msg: 'Se intenta validar el id sin validar token'
         })
     }
 
 
     try {
 
-        if ( uidUpdate2 !== uidUpdate) {
+        if (uidUpdate2 !== uidUpdate) {
             return res.status(401).json({
-                msg:'El uid no corresponde'
+                msg: 'El uid no corresponde'
             });
+        } else {
+            next();
         }
 
-        next();
-        
     } catch (error) {
         console.log(error)
         return res.status(401).json({
-            msg:'El uid no corresponde'
+            msg: 'El uid no corresponde'
         });
     }
 

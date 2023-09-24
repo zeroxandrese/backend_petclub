@@ -26,10 +26,9 @@ const idValidatorLike = async (req, res = response, next) => {
             return res.status(401).json({
                 msg: 'El uid no corresponde a los likes en esta foto'
             });
+        } else {
+            next();
         }
-
-        next();
-
     } catch (error) {
         console.log(error)
         return res.status(401).json({

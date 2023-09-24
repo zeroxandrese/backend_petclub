@@ -104,7 +104,6 @@ const cloudinaryUploadFile = async (req, res = response) => {
 
     // limpieza de archivos anteriores
     if (modelo.img) {
-        console.log('consiguio imagen');
         const nameArr = modelo.img.split('/');
         const name = nameArr[nameArr.length - 1];
         const [public_id] = name.split('.');

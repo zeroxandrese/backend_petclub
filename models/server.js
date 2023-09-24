@@ -18,6 +18,7 @@ class Server {
         this.searchPath = '/api/search';
         this.uploadsPath = '/api/uploads';
         this.commentsPath = '/api/comments';
+        this.commentsChildrenPath = '/api/commentsChildren';
         this.alertsPath = '/api/alerts';
         this.likePath = '/api/like';
         this.commentsAdminPath = '/api/commentsAdmin';
@@ -67,6 +68,7 @@ class Server {
         this.app.use(this.searchPath, require('../routes/search'));
         this.app.use(this.uploadsPath, require('../routes/uploads'));
         this.app.use(this.commentsPath, require('../routes/comments'));
+        this.app.use(this.commentsChildrenPath, require('../routes/commentsChildren'));
         this.app.use(this.alertsPath, require('../routes/alerts'));
         this.app.use(this.likePath, require('../routes/like'));
         this.app.use(this.commentsAdminPath, require('../routes/commentsAdmin'));

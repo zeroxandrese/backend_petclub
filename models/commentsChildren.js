@@ -1,15 +1,15 @@
 const { Schema, model } = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const SchemaComments = Schema({
+const SchemaCommentsChildren = Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    uidImg: {
+    uidCommentsFather: {
         type: Schema.Types.ObjectId,
-        ref: 'Image',
+        ref: 'Comments',
         required: true
     },
     comments: {
@@ -34,12 +34,12 @@ const SchemaComments = Schema({
     
 });
 
-SchemaComments.methods.toJSON = function () {
-    const { __v, _id, ...comments } = this.toObject();
-    comments.uid = _id
-    return comments;
+SchemaCommentsChildren.methods.toJSON = function () {
+    const { __v, _id, ...commentsChildren } = this.toObject();
+    commentsChildren.uid = _id
+    return commentsChildren;
 };
 
-SchemaComments.plugin(mongoosePaginate);
+SchemaCommentsChildren.plugin(mongoosePaginate);
 
-module.exports = model('Comments', SchemaComments);
+module.exports = model('CommentsChildren', SchemaCommentsChildren);

@@ -26,10 +26,9 @@ const idValidatorReport = async (req, res = response, next) => {
             return res.status(401).json({
                 msg: 'El uid no corresponde tiene alertas en esta foto'
             });
+        } else {
+            next();
         }
-
-        next();
-
     } catch (error) {
         return res.status(401).json({
             msg: 'El uid no corresponde'

@@ -7,8 +7,9 @@ const uploadFileValidation = async(files, extAllowed = ['png', 'jpg', 'jpeg', 'g
         const extFile = shortFileName[shortFileName.length - 1];
         if (!extAllowed.includes(extFile)) {
             return false;
+       }else{
+        return extFile;
        }
-       return extFile;
     } catch (error) {
         console.log(error)
     }

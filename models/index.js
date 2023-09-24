@@ -10,6 +10,7 @@ const Sexo = require('./sexo');
 const Tipo = require('./tipo');
 const Image = require('./image');
 const Comments = require('./comments');
+const CommentsChildren = require('./commentsChildren');
 const Alerts = require('./alert');
 const Like = require('./like');
 const CommentsAdmin = require('./commentsAdmin');
@@ -31,6 +32,7 @@ Like,
 CommentsAdmin,
 Pet,
 Raza,
-Report
+Report,
+CommentsChildren
 }
 
