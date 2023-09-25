@@ -13,6 +13,7 @@ const Comments = require('./comments');
 const CommentsChildren = require('./commentsChildren');
 const Alerts = require('./alert');
 const Like = require('./like');
+const LikeComments = require('./likeComments');
 const CommentsAdmin = require('./commentsAdmin');
 const Pet = require('./pet')
 const Raza = require('./raza')
@@ -33,6 +34,7 @@ CommentsAdmin,
 Pet,
 Raza,
 Report,
-CommentsChildren
+CommentsChildren,
+LikeComments
 }
 

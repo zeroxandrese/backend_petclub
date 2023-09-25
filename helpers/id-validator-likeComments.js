@@ -1,15 +1,15 @@
 const { response } = require("express");
 
-const { Like } = require('../models/index');
+const { LikeComments } = require('../models/index');
 
-const idValidatorLike = async (req, res = response, next) => {
+const idValidatorLikeComments = async (req, res = response, next) => {
     const uid = await req.userAuth;
     const id = req.params.id;
-    const validacionIdLike = await Like.findById(id);
+    const validacionIdLikeComments = await LikeComments.findById(id);
 
     const uid1 = JSON.stringify(uid._id);
     const uidUpdate = uid1.slice(1, -1);
-    const uid2 = JSON.stringify(validacionIdLike.user);
+    const uid2 = JSON.stringify(validacionIdLikeComments.user);
     const uidUpdate2 = uid2.slice(1, -1);
 
     if (!req.userAuth) {
@@ -23,7 +23,7 @@ const idValidatorLike = async (req, res = response, next) => {
 
         if (uidUpdate2 !== uidUpdate) {
             return res.status(401).json({
-                msg: 'El uid no corresponde a los likes en esta foto'
+                msg: 'El uid no corresponde a los likes del comentario'
             });
         } else {
             next();
@@ -38,5 +38,5 @@ const idValidatorLike = async (req, res = response, next) => {
 }
 
 module.exports = {
-    idValidatorLike
+    idValidatorLikeComments
 }
