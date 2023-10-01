@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments } = require('../models/index');
+const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments, LikeCommentsChildren } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -78,6 +78,13 @@ const findIdCom = async (id = "") => {
     }
 };
 
+const findIdComChild = async (id = "") => {
+    const missingId = await CommentsChildren.findById(id);
+    if (!missingId) {
+        throw new Error('El id del comentario no se encuentra registrado');
+    }
+};
+
 const findIdComChil = async (id = "") => {
     const missingId = await CommentsChildren.findById(id);
     if (!missingId) {
@@ -101,6 +108,13 @@ const findIdLike = async (id = "") => {
 
 const findIdLikeComments = async (id = "") => {
     const missingId = await LikeComments.findById(id);
+    if (!missingId) {
+        throw new Error('El id del comentario no se encuentra registrado');
+    }
+}
+
+const findIdLikeCommentsChildren = async (id = "") => {
+    const missingId = await LikeCommentsChildren.findById(id);
     if (!missingId) {
         throw new Error('El id del comentario no se encuentra registrado');
     }
@@ -136,5 +150,7 @@ module.exports = {
     isRaza,
     findIdReport,
     findIdComChil,
-    findIdLikeComments
+    findIdLikeComments,
+    findIdComChild,
+    findIdLikeCommentsChildren
 }

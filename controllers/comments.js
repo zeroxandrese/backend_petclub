@@ -26,7 +26,7 @@ const commentsPut = async (req, res = response) => {
 const commentsPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
-    const { comments, nombreUserSender, ImgUserSender, likes } = req.body;
+    const { comments } = req.body;
     const id = req.params.id;
     if (!comments) {
         return res.status(401).json({
@@ -36,10 +36,7 @@ const commentsPost = async (req, res = response) => {
     const data = {
         user: uid._id,
         uidImg: id,
-        comments,
-        nombreUserSender,
-        ImgUserSender,
-        likes
+        comments
     }
 
     const comment = new Comments(data);

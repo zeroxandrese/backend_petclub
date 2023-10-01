@@ -22,6 +22,7 @@ class Server {
         this.alertsPath = '/api/alerts';
         this.likePath = '/api/like';
         this.likeCommentsPath = '/api/likeComments';
+        this.likeCommentsChildrenPath = '/api/likeCommentsChildren';
         this.commentsAdminPath = '/api/commentsAdmin';
         this.petPath = '/api/pet';
         this.reportPath = '/api/report';
@@ -73,6 +74,7 @@ class Server {
         this.app.use(this.alertsPath, require('../routes/alerts'));
         this.app.use(this.likePath, require('../routes/like'));
         this.app.use(this.likeCommentsPath, require('../routes/likeComments'));
+        this.app.use(this.likeCommentsChildrenPath, require('../routes/likeCommentsChildren'));
         this.app.use(this.commentsAdminPath, require('../routes/commentsAdmin'));
         this.app.use(this.petPath, require('../routes/pet'));
         this.app.use(this.reportPath, require('../routes/report'));

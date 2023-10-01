@@ -20,17 +20,10 @@ const SchemaCommentsChildren = Schema({
         default: true,
         required: true
     },
-    nombreUserSender: {
-        type: String,
-        required: true
-    },
-    ImgUserSender: {
-        type: String,
-        /* required: true */
-    },
-    likes: {
-        type: Number
-    },
+    charged:{
+        type: Date,
+        default: Date.now
+    }
     
 });
 

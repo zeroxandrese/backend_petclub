@@ -1,19 +1,19 @@
 const { response, query } = require('express');
 
-const { LikeComments } = require('../models/index');
+const { LikeCommentsChildren } = require('../models/index');
 
-const likeCommentsGet = async (req, res = response) => {
+const likeCommentsChildrenGet = async (req, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
     const options = { page: page || 1, limit: 10 };
     const query = { uidComments: id, status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
-    const likeComments = await LikeComments.paginate(query, options)
-        res.status(201).json(likeComments);
+    const likeCommentChildren = await LikeCommentsChildren.paginate(query, options)
+        res.status(201).json(likeCommentChildren);
 };
 
-const likeCommentsPost = async (req, res = response) => {
+const likeCommentsChildrenPost = async (req, res = response) => {
 
     const uid = await req.userAuth;
     const { like } = req.body;
@@ -29,26 +29,26 @@ const likeCommentsPost = async (req, res = response) => {
         like
     }
 
-    const likesComments = new LikeComments(data);
+    const likesCommentsChildren = new LikeCommentsChildren(data);
 
-    await likesComments.save();
+    await likesCommentsChildren.save();
 
-    res.status(201).json(likesComments);
+    res.status(201).json(likesCommentsChildren);
 };
 
-const likeCommentsDelete = async (req, res = response) => {
+const likeCommentsChildrenDelete = async (req, res = response) => {
     const id = req.params.id;
     //Borrar comentario permanentemente
     //const comments = await Comments.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const likesComments = await LikeComments.findByIdAndUpdate(id, { status: false });
+    const likesCommentsChildren = await LikeCommentsChildren.findByIdAndUpdate(id, { status: false });
 
-    res.status(201).json({ likesComments });
+    res.status(201).json({ likesCommentsChildren });
 };
 
 module.exports = {
-    likeCommentsGet,
-    likeCommentsPost,
-    likeCommentsDelete
+    likeCommentsChildrenGet,
+    likeCommentsChildrenPost,
+    likeCommentsChildrenDelete
 }

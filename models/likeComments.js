@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const SchemaLikeComments = Schema({
     user:{
@@ -8,7 +9,7 @@ const SchemaLikeComments = Schema({
    },
    uidComments:{
     type: Schema.Types.ObjectId,
-       ref: 'Image',
+       ref: 'Comments',
        required: true
    },
    like:{
@@ -18,6 +19,10 @@ const SchemaLikeComments = Schema({
        type: Boolean,
        default: true,
        required: true
+   },
+   charged:{
+       type: Date,
+       default: Date.now
    }
 });
 
@@ -26,5 +31,7 @@ SchemaLikeComments.methods.toJSON = function(){
     likeComments.uid = _id
     return likeComments;
 }
+
+SchemaLikeComments.plugin(mongoosePaginate);
 
 module.exports = model('LikeComments', SchemaLikeComments);

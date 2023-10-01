@@ -22,6 +22,10 @@ const SchemaAlerts = Schema({
        type: Boolean,
        default: true,
        required: true
+   },
+   charged:{
+       type: Date,
+       default: Date.now
    }
 });
 

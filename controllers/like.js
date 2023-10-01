@@ -4,25 +4,13 @@ const { Like } = require('../models/index');
 
 const likeGet = async (req, res = response) => {
     const id = req.params.id;
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { uidImg :id, status: true };
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 10 };
+    const query = { uidImg: id, status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
-    const [total, likes] = await Promise.all([
-        Like.count(query),
-        Like.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-    if (total > 0) {
-        return res.status(201).json({
-            total,
-            likes
-        })
-    }
-    res.status(201).json({
-        msg:'Imagen sin likes'
-    })
+    const like = await Like.paginate(query, options)
+        res.status(201).json(like);
 };
 
 const likePost = async (req, res = response) => {
