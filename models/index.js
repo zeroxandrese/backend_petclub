@@ -16,9 +16,10 @@ const Like = require('./like');
 const LikeComments = require('./likeComments');
 const LikeCommentsChildren = require('./likeCommentsChildren');
 const CommentsAdmin = require('./commentsAdmin');
-const Pet = require('./pet')
-const Raza = require('./raza')
-const Report = require('./report')
+const Pet = require('./pet');
+const Raza = require('./raza');
+const Report = require('./report');
+const RecoveryPassword = require('./recoveryPassword');
 
 module.exports = {
 User,
@@ -37,6 +38,7 @@ Raza,
 Report,
 CommentsChildren,
 LikeComments,
-LikeCommentsChildren
+LikeCommentsChildren,
+RecoveryPassword
 }
 

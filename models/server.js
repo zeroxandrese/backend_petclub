@@ -26,6 +26,7 @@ class Server {
         this.commentsAdminPath = '/api/commentsAdmin';
         this.petPath = '/api/pet';
         this.reportPath = '/api/report';
+        this.recoveryPasswordPath = '/api/recoveryPassword';
 
 
         // Conectar a base de datos
@@ -78,6 +79,7 @@ class Server {
         this.app.use(this.commentsAdminPath, require('../routes/commentsAdmin'));
         this.app.use(this.petPath, require('../routes/pet'));
         this.app.use(this.reportPath, require('../routes/report'));
+        this.app.use(this.recoveryPasswordPath, require('../routes/recoveryPassword'));
     };
 
     sockets(){
