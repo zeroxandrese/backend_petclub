@@ -18,7 +18,7 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
 
     try {
 
-        const repeatValidation = await RecoveryPassword.findOne({ email });
+        const repeatValidation = await RecoveryPassword.findOne({ email, status: true });
 
         if (repeatValidation) {
             return res.status(401).json({
@@ -41,7 +41,7 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
         await recoveryPassword.save();
 
         const data2 = await resend.emails.send({
-            from: "PetClub <petclub@resend.dev>",
+            from: "PetClub <admin@petclub.com.pe>",
             to: `${email}`,
             subject: "Recupera tu clave de acceso en petClub",
             html: `<p>Hola ${nombre}.</p></br>
