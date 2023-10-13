@@ -44,9 +44,56 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
             from: "PetClub <admin@petclub.com.pe>",
             to: `${email}`,
             subject: "Recupera tu clave de acceso en petClub",
-            html: `<p>Hola ${nombre}.</p></br>
-            <p>Código de Verificación para Recuperar Contraseña en petClub: <strong>${code}</strong></p></br>
-            <p>¡Gracias por ser parte de PetClub, la comunidad de amantes de las mascotas!.</p>`,
+            html: `    <html>
+            <head>
+                <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                }
+        
+                .container {
+                    background: linear-gradient(135deg, #4CC9F0 0%, #7209B7 100%);
+                    padding: 90px 35%; /* Relleno vertical y relleno horizontal */
+                }
+        
+                .content {
+                    background: #FFFFFF;
+                    padding: 20px;
+                }
+        
+                .code {
+                    font-size: 26px;
+                    letter-spacing: 4px;
+                    text-align: center;
+                }
+        
+                @media screen and (max-width: 600px) {
+                    .container {
+                        background: linear-gradient(135deg, #4CC9F0 0%, #7209B7 100%);
+                        padding: 50px 5%;
+                    }
+        
+                    .code {
+                        font-size: 20px;
+                        text-align: center
+                    }
+                }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="content">
+                        <p>Hola ${nombre}.</p>
+                        <p>Código de Verificación para Recuperar Contraseña en petClub:</p>
+                        <p class="code"><strong>${code}</strong></p>
+                        <p>¡Gracias por ser parte de PetClub, la comunidad de amantes de las mascotas!</p>
+                        <p>NOVAMATRIX | Lima - Perú</p>
+                    </div>
+                </div>
+            </body>
+            </html>`,
         });
         console.log(data2)
         res.status(201).json(recoveryPassword);
