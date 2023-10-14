@@ -22,7 +22,7 @@ const recoveryPasswordPost = async (req, res = response) => {
         const resp = await RecoveryPassword.findOne({ user: user._id, status: true, code: code });
 
         //Generar JWT
-        const token = await generateJwt(user.id);
+        const token = await generateJwt(user._id);
 
         if (resp) {
             res.status(201).json({
@@ -54,8 +54,7 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
     try {
 
         const user = await User.findOne({ email })
-
-        const repeatValidation = await RecoveryPassword.findOne({ user: user.uid, status: true });
+        const repeatValidation = await RecoveryPassword.findOne({ user: user._id, status: true });
 
         if (repeatValidation) {
             return res.status(401).json({
@@ -63,14 +62,12 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
             })
         }
 
-        const userValidation = await User.findOne({ email });
-
-        const { nombre } = userValidation;
+        const { nombre } = user;
 
         code = Math.floor(generator.random() * 9000) + 1000;
 
         const data = {
-            user: userValidation,
+            user: user,
             code
         }
 
