@@ -2,15 +2,19 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 
 
-const { recoveryPasswordPostValidation } = require('../controllers/recoveryPassword');
-const {  findEmail } = require('../helpers/db-validators');
+const { recoveryPasswordPostValidation, recoveryPasswordGet } = require('../controllers/recoveryPassword');
+const { validarCampos } = require('../middelwares/validar-campos');
 
 
 const router = Router();
 
+router.get('/:email', [
+    check('email', 'El correo es obligatorio').isEmail().not().isEmpty(),
+    validarCampos
+], recoveryPasswordGet);
+
 router.post('/:email', [
     check('email', 'El correo es obligatorio').isEmail().not().isEmpty(),
-    check('email').custom( findEmail ),
 ], recoveryPasswordPostValidation);
 
 module.exports = router;

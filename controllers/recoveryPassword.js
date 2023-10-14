@@ -5,6 +5,29 @@ let generator = new MersenneTwister();
 
 const { RecoveryPassword, User } = require('../models/index');
 
+
+const recoveryPasswordGet = async (req, res = response) => {
+
+    const { code } = req.body;
+    const email = req.params.email;
+    const user = await User.findOne({ email })
+
+    const { limite = 5, desde = 0 } = req.query;
+    const query = { user: user._id, status: true, code: code };
+
+    const [total, recoveryPassword] = await Promise.all([
+        RecoveryPassword.countDocuments(query),
+        RecoveryPassword.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite))
+    ]);
+
+    res.json({
+        total,
+        recoveryPassword
+    });
+};
+
 const recoveryPasswordPostValidation = async (req, res = response) => {
 
     const resend = new Resend(process.env.RESENDKEY);
@@ -18,7 +41,9 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
 
     try {
 
-        const repeatValidation = await RecoveryPassword.findOne({ email, status: true });
+        const user = await User.findOne({ email })
+
+        const repeatValidation = await RecoveryPassword.findOne({ user: user.uid, status: true });
 
         if (repeatValidation) {
             return res.status(401).json({
@@ -103,5 +128,6 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
 };
 
 module.exports = {
-    recoveryPasswordPostValidation
+    recoveryPasswordPostValidation,
+    recoveryPasswordGet
 };
