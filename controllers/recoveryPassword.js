@@ -6,26 +6,32 @@ let generator = new MersenneTwister();
 const { RecoveryPassword, User } = require('../models/index');
 
 
-const recoveryPasswordGet = async (req, res = response) => {
+const recoveryPasswordPost = async (req, res = response) => {
 
     const { code } = req.body;
     const email = req.params.email;
     const user = await User.findOne({ email })
+    if (!code) {
+        return res.status(401).json({
+            msg: 'Necesita enviar un código'
+        })
+    };
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { user: user._id, status: true, code: code };
+    try {
+        const resp = await RecoveryPassword.findOne({ user: user._id, status: true, code: code });
 
-    const [total, recoveryPassword] = await Promise.all([
-        RecoveryPassword.countDocuments(query),
-        RecoveryPassword.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-
-    res.json({
-        total,
-        recoveryPassword
-    });
+        if (resp) {
+            res.status(201).json({
+                msg: 'Código autorizado'
+            });
+        } else {
+            res.status(401).json({
+                msg: 'Código no autorizado'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ error });
+    }
 };
 
 const recoveryPasswordPostValidation = async (req, res = response) => {
@@ -65,8 +71,8 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
         const recoveryPassword = new RecoveryPassword(data);
         await recoveryPassword.save();
 
-        const data2 = await resend.emails.send({
-            from: "PetClub <admin@petclub.com.pe>",
+        await resend.emails.send({
+            from: "petClub <admin@petclub.com.pe>",
             to: `${email}`,
             subject: "Recupera tu clave de acceso en petClub",
             html: `    <html>
@@ -113,15 +119,16 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
                         <p>Hola ${nombre}.</p>
                         <p>Código de Verificación para Recuperar Contraseña en petClub:</p>
                         <p class="code"><strong>${code}</strong></p>
-                        <p>¡Gracias por ser parte de PetClub, la comunidad de amantes de las mascotas!</p>
+                        <p>¡Gracias por ser parte de petClub, la comunidad de amantes de las mascotas!</p>
                         <p>NOVAMATRIX | Lima - Perú</p>
                     </div>
                 </div>
             </body>
             </html>`,
         });
-        console.log(data2)
-        res.status(201).json(recoveryPassword);
+        res.status(201).json({
+            msg: 'Código enviado'
+        });
     } catch (error) {
         res.status(500).json({ error });
     }
@@ -129,5 +136,5 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
 
 module.exports = {
     recoveryPasswordPostValidation,
-    recoveryPasswordGet
+    recoveryPasswordPost
 };

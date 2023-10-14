@@ -27,6 +27,7 @@ class Server {
         this.petPath = '/api/pet';
         this.reportPath = '/api/report';
         this.recoveryPasswordPath = '/api/recoveryPassword';
+        this.recoveryPasswordCodePath = '/api/recoveryPasswordCode';
 
 
         // Conectar a base de datos
@@ -80,6 +81,7 @@ class Server {
         this.app.use(this.petPath, require('../routes/pet'));
         this.app.use(this.reportPath, require('../routes/report'));
         this.app.use(this.recoveryPasswordPath, require('../routes/recoveryPassword'));
+        this.app.use(this.recoveryPasswordCodePath, require('../routes/recoveryPasswordCode'));
     };
 
     sockets(){
