@@ -1,5 +1,6 @@
 const { response, query } = require('express');
 const { Resend } = require('resend');
+const { generateJwt } = require('../helpers/generate-jwt');
 let MersenneTwister = require('mersenne-twister');
 let generator = new MersenneTwister();
 
@@ -20,9 +21,14 @@ const recoveryPasswordPost = async (req, res = response) => {
     try {
         const resp = await RecoveryPassword.findOne({ user: user._id, status: true, code: code });
 
+        //Generar JWT
+        const token = await generateJwt(user.id);
+
         if (resp) {
             res.status(201).json({
-                msg: 'Código autorizado'
+                uid: user._id,
+                msg: 'Código autorizado',
+                token
             });
         } else {
             res.status(401).json({
