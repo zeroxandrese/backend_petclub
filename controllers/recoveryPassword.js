@@ -52,8 +52,13 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
     };
 
     try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                msg: 'Email no registrado'
+            })
+        };
 
-        const user = await User.findOne({ email })
         const repeatValidation = await RecoveryPassword.findOne({ user: user._id, status: true });
 
         if (repeatValidation) {
