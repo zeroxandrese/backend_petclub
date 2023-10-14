@@ -10,9 +10,9 @@ cron.schedule('*/2 * * * *', async () => {
   try {
     await dbContection();
     
-    const cutoffTime = new Date(Date.now() - 5 * 60 * 1000); // Obtener la hora actual - 5 minutos
+    const cutoffTime = new Date(Date.now() - 4 * 60 * 1000); // Obtener la hora actual - 4 minutos
 
-    // Actualizacion de status de los registros cuya fecha de creación sea mayor a 5 minutos
+    // Actualizacion de status de los registros cuya fecha de creación sea mayor a 4 minutos
    const result = await RecoveryPassword.updateMany(
       { charged: { $lte: cutoffTime } },
       { $set: { status: false } },
