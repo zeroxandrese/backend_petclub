@@ -84,7 +84,12 @@ const imagesPost = async (req, res = response) => {
       const data = {
         user: uid._id,
         img: videoUploadResult.secure_url,
-        descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+        descripcion: req.body.data.descripcion,
+        actionPlan: req.body.data.actionPlan,
+        fechaEvento: req.body.data.fechaEvento,
+        longitudeEvento: req.body.data.longitudeEvento,
+        lantitudeEvento: req.body.data.lantitudeEvento,
+        horaEvento: req.body.data.horaEvento
       };
 
       const image = new Image(data);
@@ -99,8 +104,13 @@ const imagesPost = async (req, res = response) => {
 
       const data = {
         user: uid._id,
-        img: imageUploadResult.secure_url,
-        descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+        img: videoUploadResult.secure_url,
+        descripcion: req.body.data.descripcion,
+        actionPlan: req.body.data.actionPlan,
+        fechaEvento: req.body.data.fechaEvento,
+        longitudeEvento: req.body.data.longitudeEvento,
+        lantitudeEvento: req.body.data.lantitudeEvento,
+        horaEvento: req.body.data.horaEvento
       };
 
       const image = new Image(data);

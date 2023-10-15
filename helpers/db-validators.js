@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments, LikeCommentsChildren } = require('../models/index');
+const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments, LikeCommentsChildren, ActionPlan } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -20,6 +20,13 @@ const isTipo = async (tipo = "") => {
         throw new Error('El pais no se encuentra definido');
     }
 }; */
+
+const isActionPlan = async (actionPlan = "") => {
+    const missingActionPlan = await ActionPlan.findOne({ actionPlan });
+    if (!missingActionPlan) {
+        throw new Error('El actionPlan no se encuentra definido');
+    }
+};
 
 const isSexo = async (sexo = "") => {
     const missingSexo = await Sexo.findOne({ sexo });
@@ -121,7 +128,7 @@ const findIdLikeCommentsChildren = async (id = "") => {
 }
 
 const findIdImgCom = async (id = "") => {
-    const missingId = await Image.findOne({id});
+    const missingId = await Image.findOne({ id });
     if (!missingId) {
         throw new Error('El id no se encuentra registrado');
     }
@@ -152,5 +159,6 @@ module.exports = {
     findIdComChil,
     findIdLikeComments,
     findIdComChild,
-    findIdLikeCommentsChildren
+    findIdLikeCommentsChildren,
+    isActionPlan
 }

@@ -4,6 +4,7 @@
 
 const User = require('./user');
 const Pais = require('./pais');
+const ActionPlan = require('./actionPlan');
 const Role = require('./role');
 const Server = require('./server');
 const Sexo = require('./sexo');
@@ -39,6 +40,7 @@ Report,
 CommentsChildren,
 LikeComments,
 LikeCommentsChildren,
-RecoveryPassword
+RecoveryPassword,
+ActionPlan
 }
 

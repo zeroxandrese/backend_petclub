@@ -21,6 +21,38 @@ const SchemaImg = Schema({
     charged:{
         type: Date,
         default: Date.now
+    },
+    actionPlan:{
+        type: String,
+        default: "IMAGE",
+        required: true
+    },
+    fechaEvento:{
+        type: Date
+    },
+    longitudeEvento:{
+        type: Number
+    },
+    lantitudeEvento:{
+        type: Number
+    },
+    horaEvento:{
+        type: Number
+    },
+    optionalDate:{
+        type: Date
+    },
+    optionalString1:{
+        type: String
+    },
+    optionalString2:{
+        type: String
+    },
+    optionalNumber1:{
+        type: Number
+    },
+    optionalNumber2:{
+        type: Number
     }
 });
 

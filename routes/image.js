@@ -3,7 +3,7 @@ const { check } = require('express-validator');
 
 const { validarCampos } = require('../middelwares/validar-campos');
 const { imagesPost, imagesDelete, imagesGet, imagesPut } = require('../controllers/image');
-const { findIdImg } = require('../helpers/db-validators');
+const { findIdImg, isActionPlan } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorImg } = require('../helpers/id-validator-img');
 const { verifyUploadFile } = require('../middelwares/validar-archivo');
@@ -26,7 +26,8 @@ router.put('/:id', [
 router.post('/', [
     validarJWT,
     verifyUploadFile,
-    validarCampos,
+    check('actionPlan').custom(isActionPlan),
+    validarCampos
 ], imagesPost);
 
 router.delete('/:id', [
