@@ -2,7 +2,7 @@ const { response, query } = require('express');
 const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const { Pet } = require('../models/index');
+const { Pet, Image } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
 
@@ -35,10 +35,45 @@ const petsGetAllOfUser = async (req, res = response) => {
 const petsPut = async (req, res = response) => {
     const id = req.params.id;
     const { ...pet } = req.body;
+    const { perdido, longitudePerdida, lantitudePerdida, fechaPerdida } = req.body;
 
-    const mascota = await Pet.findByIdAndUpdate(id, pet);
+    try {
+        const petPutValidation = await Pet.findById(id);
+        if (petPutValidation.perdido === false) {
+            if (perdido === true) {
+                const data = {
+                    user: petPutValidation.user,
+                    pet: id,
+                    img: petPutValidation.img,
+                    descripcion: petPutValidation.descripcion,
+                    actionPlan: "LOST",
+                    fechaEvento: fechaPerdida,
+                    longitudeEvento: longitudePerdida,
+                    lantitudeEvento: lantitudePerdida
+                };
 
-    res.status(201).json(mascota);
+                const image = new Image(data);
+                await image.save();
+            }
+        };
+
+        if (petPutValidation.perdido === true) {
+            if (perdido === false) {
+                const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id });
+                if (resp) {
+                    await Image.findByIdAndUpdate(resp._id, { status: false });
+                }
+            }
+        };
+
+        const mascota = await Pet.findByIdAndUpdate(id, pet);
+
+        res.status(201).json(mascota);
+    } catch (error) {
+        res.status(500).json({
+            msg: 'Algo salio mal, contacte con el administrador'
+        })
+    }
 };
 
 const petsPost = async (req, res = response) => {
@@ -76,7 +111,9 @@ const petsPost = async (req, res = response) => {
         });
 
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            msg: 'Algo salio mal, contacte con el administrador'
+        });
     }
 };
 

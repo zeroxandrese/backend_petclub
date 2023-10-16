@@ -26,7 +26,7 @@ router.put('/:id', [
 router.post('/', [
     validarJWT,
     verifyUploadFile,
-    check('actionPlan').custom(isActionPlan),
+/*     check('actionPlan').custom(isActionPlan), */
     validarCampos
 ], imagesPost);
 

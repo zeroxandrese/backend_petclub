@@ -16,7 +16,6 @@ const verifyToken = async (req, res = response) => {
         });
 
     } catch (error) {
-        console.log(err)
         res.status(500).json({
             msg: 'Algo salio mal, contacte con el administrador'
         })
@@ -58,7 +57,6 @@ const login = async (req, res = response) => {
         });
 
     } catch (err) {
-        console.log(err)
         res.status(500).json({
             msg: 'Algo salio mal, contacte con el administrador'
         })
@@ -106,7 +104,6 @@ const googleLogin = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al autenticar con Google:', error);
         res.status(500).json({ msg: 'Error en el servidor' });
     }
 };

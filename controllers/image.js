@@ -84,12 +84,8 @@ const imagesPost = async (req, res = response) => {
       const data = {
         user: uid._id,
         img: videoUploadResult.secure_url,
-        descripcion: req.body.data.descripcion,
-        actionPlan: req.body.data.actionPlan,
-        fechaEvento: req.body.data.fechaEvento,
-        longitudeEvento: req.body.data.longitudeEvento,
-        lantitudeEvento: req.body.data.lantitudeEvento,
-        horaEvento: req.body.data.horaEvento
+        descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+        actionPlan: "IMAGE",
       };
 
       const image = new Image(data);
@@ -104,13 +100,9 @@ const imagesPost = async (req, res = response) => {
 
       const data = {
         user: uid._id,
-        img: videoUploadResult.secure_url,
-        descripcion: req.body.data.descripcion,
-        actionPlan: req.body.data.actionPlan,
-        fechaEvento: req.body.data.fechaEvento,
-        longitudeEvento: req.body.data.longitudeEvento,
-        lantitudeEvento: req.body.data.lantitudeEvento,
-        horaEvento: req.body.data.horaEvento
+        img: imageUploadResult.secure_url,
+        descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+        actionPlan: "IMAGE"
       };
 
       const image = new Image(data);
@@ -119,7 +111,6 @@ const imagesPost = async (req, res = response) => {
       res.status(201).json(image);
     }
   } catch (error) {
-    console.error('Error en la función imagesPost:', error);
     res.status(500).json({ error: 'Error contacte al admin' });
   }
 };
