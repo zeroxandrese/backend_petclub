@@ -12,7 +12,7 @@ const imagesGet = async (req, res = response) => {
   const query = { status: true };
 
   // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
-  const imagenes = await Image.paginate({}, options)
+  const imagenes = await Image.paginate(query, options)
   res.status(201).json(imagenes)
 }
 
