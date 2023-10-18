@@ -43,6 +43,9 @@ const SchemaPet = Schema({
     fechaPerdida:{
         type: Date
     },
+    horaPerdida:{
+        type: String
+    },
     longitudePerdida:{
         type: Number
     },

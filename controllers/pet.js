@@ -35,7 +35,7 @@ const petsGetAllOfUser = async (req, res = response) => {
 const petsPut = async (req, res = response) => {
     const id = req.params.id;
     const { ...pet } = req.body;
-    const { perdido, longitudePerdida, lantitudePerdida, fechaPerdida } = req.body;
+    const { perdido, longitudePerdida, lantitudePerdida, fechaPerdida, horaPerdida } = req.body;
 
     try {
         const petPutValidation = await Pet.findById(id);
@@ -47,9 +47,10 @@ const petsPut = async (req, res = response) => {
                     img: petPutValidation.img,
                     descripcion: petPutValidation.descripcion,
                     actionPlan: "LOST",
-                    fechaEvento: fechaPerdida,
-                    longitudeEvento: longitudePerdida,
-                    lantitudeEvento: lantitudePerdida
+                    fechaEvento: fechaPerdida || new Date(),
+                    horaEvento: horaPerdida || '',
+                    longitudeEvento: longitudePerdida || 0,
+                    lantitudeEvento: lantitudePerdida || 0
                 };
 
                 const image = new Image(data);
@@ -58,8 +59,12 @@ const petsPut = async (req, res = response) => {
         };
 
         if (petPutValidation.perdido === true) {
-            if (perdido === false) {
-                const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id });
+            if (perdido === true) {
+                res.status(400).json({
+                    msg: 'La mascota ya fue reportada'
+                })
+            } else {
+                const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
                 }

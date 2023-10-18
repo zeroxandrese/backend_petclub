@@ -41,22 +41,7 @@ const SchemaImg = Schema({
         type: Number
     },
     horaEvento:{
-        type: Number
-    },
-    optionalDate:{
-        type: Date
-    },
-    optionalString1:{
         type: String
-    },
-    optionalString2:{
-        type: String
-    },
-    optionalNumber1:{
-        type: Number
-    },
-    optionalNumber2:{
-        type: Number
     }
 });
 
