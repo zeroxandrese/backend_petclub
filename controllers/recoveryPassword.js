@@ -82,6 +82,7 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
         await resend.emails.send({
             from: "petClub <admin@petclub.com.pe>",
             to: `${email}`,
+            reply_to: "petclubprueba@gmail.com",
             subject: "Recupera tu clave de acceso en petClub",
             html: `    <html>
             <head>
