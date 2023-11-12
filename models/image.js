@@ -42,6 +42,9 @@ const SchemaImg = Schema({
     },
     horaEvento:{
         type: String
+    },
+    namePet:{
+        type: String
     }
 });
 

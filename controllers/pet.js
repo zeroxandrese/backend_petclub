@@ -50,7 +50,8 @@ const petsPut = async (req, res = response) => {
                     fechaEvento: fechaPerdida || new Date(),
                     horaEvento: horaPerdida || '',
                     longitudeEvento: longitudePerdida || 0,
-                    lantitudeEvento: lantitudePerdida || 0
+                    lantitudeEvento: lantitudePerdida || 0,
+                    namePet: petPutValidation.nombre
                 };
 
                 const image = new Image(data);
