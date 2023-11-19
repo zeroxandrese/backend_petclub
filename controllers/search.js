@@ -11,7 +11,8 @@ const collectionPermitidas = [
     'pets',
     'users',
     'images',
-    'petsalluser'
+    'petsalluser',
+    'imagesLost'
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -108,11 +109,38 @@ const searchImages = async (term = '', res = response) => {
         results: image
     });
 
-}
+};
+
+const searchImagesLost = async ( latPunto, lonPunto, res = response) => {
+    const query = {
+        $and: [
+            { status: true },
+            { actionPlan: 'LOST' }
+        ]
+    };
+
+    const images = await Image.find(query);
+
+    // Verifica si se proporcionaron las coordenadas del punto de referencia
+    if (latPunto && lonPunto) {
+        // Filtra las imágenes por distancia usando las coordenadas proporcionadas
+        const radioKm = 2; // variable de KM a la redonda
+        const imagesFiltradas = images.filter(image => {
+            const distancia = calcularDistancia(latPunto, lonPunto, image.lantitudeEvento, image.longitudeEvento);
+            return distancia <= radioKm;
+        });
+
+        images = imagesFiltradas;
+    }
+
+    res.status(201).json({
+         images
+    });
+};
 
 const searchGet = async (req, res = response) => {
 
-    const { collection, term } = req.params;
+    const { collection, latPunto, lonPunto, term } = req.params;
 
     if (!collectionPermitidas.includes(collection)) {
         return res.status(400).json({
@@ -138,6 +166,9 @@ const searchGet = async (req, res = response) => {
             break;
         case 'users':
             searchUsuarios(term, res);
+            break;
+        case 'imagesLost':
+            searchImagesLost( latPunto, lonPunto, res);
             break;
 
         default:
