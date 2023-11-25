@@ -5,7 +5,7 @@ const { Comments } = require('../models/index');
 const commentsGet = async (req, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
-    const options = { page: page || 1, limit: 10 };
+    const options = { page: page || 1, limit: 500 };
     const query = { uidImg :id, status: true };
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de comentarios
