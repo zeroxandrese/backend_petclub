@@ -5,7 +5,8 @@ const { validarCampos } = require('../middelwares/validar-campos');
 const { commentsGet,
     commentsPut,
     commentsPost,
-    commentsDelete } = require('../controllers/comments');
+    commentsDelete,
+    twoCommentsGet } = require('../controllers/comments');
 const { findIdImg, findIdCom, findIdImgCom } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { idValidatorCom, idValidatorComOwner } = require('../helpers/id-validator-comments');
@@ -18,6 +19,13 @@ router.get('/:id', [
     check('id').custom(findIdImgCom),
     validarCampos
 ], commentsGet);
+
+router.get('/twoComments/:id', [
+    validarJWT,
+    check('id', 'El id no es valido').isMongoId(),
+    check('id').custom(findIdImgCom),
+    validarCampos
+], twoCommentsGet);
 
 router.put('/:id', [
     validarJWT,

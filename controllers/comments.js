@@ -8,7 +8,16 @@ const commentsGet = async (req, res = response) => {
     const options = { page: page || 1, limit: 500 };
     const query = { uidImg :id, status: true };
 
-    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de comentarios
+    const comments = await Comments.paginate(query, options)
+        res.status(201).json(comments);
+};
+
+const twoCommentsGet = async (req, res = response) => {
+    const id = req.params.id;
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 2 };
+    const query = { uidImg :id, status: true };
+
     const comments = await Comments.paginate(query, options)
         res.status(201).json(comments);
 };
@@ -61,5 +70,6 @@ module.exports = {
     commentsGet,
     commentsPut,
     commentsPost,
-    commentsDelete
+    commentsDelete,
+    twoCommentsGet
 }
