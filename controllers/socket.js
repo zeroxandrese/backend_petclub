@@ -1,6 +1,7 @@
 
 
 const socketController = (socket) => {
+  console.log(`Socket conectado en puerto: ${socket.conn.remotePort}`)
     console.log('socket conectado');
 
   socket.on('enviar-uid', ({uid})=>{
