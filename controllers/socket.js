@@ -10,8 +10,9 @@ const socketController = (socket) => {
 
   socket.on('recibir-comments', ({ uid, nombre, uidDestino, imgUid }) => {
     console.log('recibí en el servidor esto:', uid, nombre, uidDestino, imgUid);
-    console.log('este es el uid:', uid);
+    console.log('este es el uid:', uidDestino);
     if (uidDestino) {
+      console.log('ID del socket conectado:', socket.id);
       socket.to(uidDestino).emit('mensaje-privado', uid);
       
     }
