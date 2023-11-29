@@ -12,6 +12,7 @@ const socketController = (socket) => {
     console.log('este es el uid:', uid);
     if (uidDestino) {
       socket.join(uidDestino);
+      console.log(`Socket unido a la sala con UID: ${uidDestino}`);
       socket.to(uidDestino).emit('mensaje-privado', uid);
       
     }
