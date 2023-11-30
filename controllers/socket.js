@@ -12,7 +12,7 @@ const socketController = (socket) => {
     console.log('este es el uid:', uidDestino);
     if (uidDestino) {
       console.log('ID del socket conectado:', socket.id);
-      socket.to(uidDestino).emit('mensaje-privado', uid);
+      socket.to(socket.id).emit('mensaje-privado', uid);
       
     }
   });
