@@ -10,10 +10,10 @@ const socketController = (socket) => {
   socket.on('recibir-comments', ({ uid, nombre, uidDestino, imgUid }) => {
     console.log('recibí en el servidor esto:', uid, nombre, uidDestino, imgUid);
     console.log('este es el uid:', uidDestino);
-    socket.to(socket.id).emit('prueba', 'Hola desde el servidor');
+    socket.emit('prueba', 'Hola desde el servidor');
     if (socket.id) {
       console.log('ID del socket conectado:', socket.id);
-      socket.broadcast.to(socket.id).emit('mensaje-privado', uid);
+      socket.broadcast.emit('mensaje-privado', uid);
       
     }
   });
