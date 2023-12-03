@@ -8,11 +8,11 @@ class Server {
 
     constructor() {
         this.app = express();
-        this.port = '*';
+        this.port = process.env.PORT;
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server, {
             cors: {
-              origin: process.env.API_URL_SOCKET,
+              origin: '*',
               methods: ['GET', 'POST'],
               transports: ['websocket', 'polling']
             },
