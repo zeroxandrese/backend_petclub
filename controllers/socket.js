@@ -13,7 +13,7 @@ const socketController = (socket) => {
     socket.emit('prueba', 'Hola desde el servidor');
     if (socket.id) {
       console.log('ID del socket conectado:', socket.id);
-      socket.broadcast.emit('mensaje-privado', uid);
+      socket.to(socket.id).emit('prueba', 'Hola desde el servidor');
       
     }
   });
