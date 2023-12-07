@@ -1,7 +1,8 @@
 const { Notifications } = require('../models/index');
+const { Socket } = require('socket.io');
 const { verifyToken } = require('../helpers/generate-jwt')
 
-const socketController = async (socket = new So) => {
+const socketController = async (socket = new Socket() ) => {
 
   const usuario = await verifyToken(socket.handshake.headers['z-token']);
   if (!usuario) {
