@@ -21,6 +21,7 @@ const Pet = require('./pet');
 const Raza = require('./raza');
 const Report = require('./report');
 const RecoveryPassword = require('./recoveryPassword');
+const Notifications = require('./notifications');
 
 module.exports = {
 User,
@@ -41,6 +42,7 @@ CommentsChildren,
 LikeComments,
 LikeCommentsChildren,
 RecoveryPassword,
-ActionPlan
+ActionPlan,
+Notifications
 }
 
