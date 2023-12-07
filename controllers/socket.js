@@ -1,12 +1,14 @@
 const { Notifications } = require('../models/index');
+const { verifyToken } = require('../helpers/generate-jwt')
 
-const socketController = (socket) => {
-  console.log('socket conectado');
-  console.log(socket);
+const socketController = async(socket = new So) => {
 
-  socket.on('enviar-uid', ({ uid }) => {
-    console.log('paso por aqui', uid);
-  });
+  const usuario = await verifyToken(socket.handshake.headers['z-token']);
+  if(!usuario){
+    return socket.disconnect();
+  }
+
+  console.log(`se conectó ${usuario.nombre}`)
 
   socket.on('recibir-comments', async ({ userOwner, imgUid, userSender, event }) => {
     socket.emit('prueba', 'Hola desde el servidor');
@@ -30,9 +32,6 @@ const socketController = (socket) => {
     } */
   });
 
-  socket.on('disconnect', () => {
-    console.log('cliente desconectado');
-  });
 };
 
 module.exports = {
