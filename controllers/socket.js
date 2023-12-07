@@ -11,6 +11,8 @@ const socketController = async (socket = new Socket() ) => {
 
   console.log(`se conectó ${usuario.nombre}`)
 
+  socket.emit('prueba', 'Hola desde el servidor');
+
   socket.on('recibir-comments', async ({ userOwner, imgUid, userSender, event }) => {
     socket.emit('prueba', 'Hola desde el servidor');
     /*     if (userOwner && imgUid && userSender && event) {
