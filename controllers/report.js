@@ -29,8 +29,8 @@ const reportPost = async (req, res = response) => {
 
 const reportDelete = async (req, res = response) => {
     const id = req.params.id;
-    //Borrar comentario permanentemente
-    //const comments = await Comments.findByIdAndDelete( id );
+    //Borrar report permanentemente
+    //const report = await Report.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
     const report = await Report.findByIdAndUpdate(id, { status: false });

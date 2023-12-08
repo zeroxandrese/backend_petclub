@@ -45,7 +45,8 @@ const socketController = async (socket = new Socket()) => {
 
   socket.on('disconnect', async () => {
     console.log(`Se desconectó ${usuario.nombre} con el socket ID: ${socket.id}`);
-    await UserConnect.findByIdAndDelete(usuario._id);
+    const { uid } = await UserConnect.findOne(usuario._id);
+    await UserConnect.findByIdAndDelete(uid);
   });
 
 };
