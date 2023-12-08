@@ -24,7 +24,7 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
 
   socket.on('notifications-comments', async ({ imgUid }) => {
-    console.log('este es el console del uid img',imgUid);
+    console.log('este es el console del uid img', imgUid);
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
@@ -38,12 +38,10 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        socket.to(userValidation._id).emit('mensaje-privado',{ de: usuario.nombre });
+        socket.to(userValidation._id).emit('mensaje-privado', { de: usuario.nombre });
 
       } catch (error) {
-        res.status(500).json({
-          msg: 'Algo salio mal, contacte con el administrador'
-        })
+        console.error('Error al desconectar el socket:', error);
       }
     }
   });
