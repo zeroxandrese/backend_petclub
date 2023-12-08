@@ -14,7 +14,7 @@ const socketController = async (socket = new Socket()) => {
   if (userValidationConnected) {
     await UserConnect.findByIdAndDelete(userValidationConnected._id);
   }
-  
+
   const data = {
     user: usuario._id
   }
@@ -24,19 +24,21 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
 
   socket.on('notifications-comments', async ({ imgUid }) => {
-    console.log('pruebita');
+    console.log(imgUid);
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid)
         const data = {
-          userOwner: usuario,
-          imgUid,
-          userSender: userValidation,
+          userOwner: usuario._id,
+          imgUid: imgUid.uid,
+          userSender: userValidation._id,
           event: "COMMENTS"
         };
         const notifications = new Notifications(data);
         await notifications.save();
+
+        socket.to(userValidation._id).emit('mensaje-privado',{ de: usuario.nombre });
 
       } catch (error) {
         res.status(500).json({
@@ -48,8 +50,17 @@ const socketController = async (socket = new Socket()) => {
 
   socket.on('disconnect', async () => {
     console.log(`Se desconectó ${usuario.nombre} con el socket ID: ${socket.id}`);
-    const { _id } = await UserConnect.findOne(usuario._id);
-    await UserConnect.findByIdAndDelete(_id);
+    if (usuario._id) {
+      try {
+        const userConnect = await UserConnect.findOne(usuario._id);
+        if (userConnect) {
+          const { _id } = userConnect;
+          await UserConnect.findByIdAndDelete(_id);
+        }
+      } catch (error) {
+        console.error('Error al desconectar el socket:', error);
+      }
+    }
   });
 
 };
