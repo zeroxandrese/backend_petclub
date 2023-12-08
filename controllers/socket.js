@@ -24,14 +24,15 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
 
   socket.on('notifications-comments', async ({ imgUid }) => {
+    console.log('pruebita');
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid)
         const data = {
-          userOwner: usuario._id,
+          userOwner: usuario,
           imgUid,
-          userSender: userValidation._id,
+          userSender: userValidation,
           event: "COMMENTS"
         };
         const notifications = new Notifications(data);
