@@ -19,8 +19,6 @@ const socketController = async (socket = new Socket()) => {
 
   await userConnect.save();
 
-  socket.emit('prueba', 'Hola desde el servidor');
-
   socket.on('notifications-comments', async ({ imgUid }) => {
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
@@ -35,7 +33,6 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        res.status(201).json(notifications);
       } catch (error) {
         res.status(500).json({
           msg: 'Algo salio mal, contacte con el administrador'
