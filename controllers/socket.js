@@ -24,7 +24,7 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
 
   socket.on('notifications-comments', async ({ imgUid }) => {
-    console.log(imgUid);
+    console.log('este es el console del uid img',imgUid);
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
