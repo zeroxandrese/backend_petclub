@@ -37,6 +37,8 @@ const socketController = async (socket = new Socket()) => {
         await notifications.save();
 
         socket.to(userValidation.user).emit('mensaje-privado', { de: usuario.nombre });
+        socket.emit('mensaje-prueba', { de: usuario.nombre });
+        console.log('este es el final de todo el proceso');
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
