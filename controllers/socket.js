@@ -1,15 +1,23 @@
 const { Notifications } = require('../models/index');
 const { Socket } = require('socket.io');
-const { verifyToken } = require('../helpers/generate-jwt')
+const { verifyToken } = require('../helpers/generate-jwt');
 
-const socketController = async (socket = new Socket() ) => {
+const { UserConnect } = require('../models/index');
+
+const socketController = async (socket = new Socket()) => {
 
   const usuario = await verifyToken(socket.handshake.headers['z-token']);
   if (!usuario) {
     return socket.disconnect();
   }
 
-  console.log(`se conectó ${usuario.nombre}`)
+  const data = {
+    user: usuario._id
+  }
+
+  const userConnect = new UserConnect(data);
+
+  await userConnect.save();
 
   socket.emit('prueba', 'Hola desde el servidor');
 
@@ -35,8 +43,9 @@ const socketController = async (socket = new Socket() ) => {
         } */
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     console.log(`Se desconectó ${usuario.nombre} con el socket ID: ${socket.id}`);
+    await UserConnect.findByIdAndDelete(usuario._id);
   });
 
 };

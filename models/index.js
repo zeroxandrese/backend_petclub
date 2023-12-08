@@ -22,6 +22,7 @@ const Raza = require('./raza');
 const Report = require('./report');
 const RecoveryPassword = require('./recoveryPassword');
 const Notifications = require('./notifications');
+const UserConnect = require('./userConnect');
 
 module.exports = {
 User,
@@ -43,6 +44,7 @@ LikeComments,
 LikeCommentsChildren,
 RecoveryPassword,
 ActionPlan,
-Notifications
+Notifications,
+UserConnect
 }
 
