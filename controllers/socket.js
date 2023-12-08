@@ -20,8 +20,8 @@ const socketController = async (socket = new Socket()) => {
   }
 
   const userConnect = new UserConnect(data);
-
   await userConnect.save();
+  socket.join(usuario._id);
 
   socket.on('notifications-comments', async ({ imgUid }) => {
     if (imgUid) {
@@ -37,8 +37,6 @@ const socketController = async (socket = new Socket()) => {
         await notifications.save();
 
         socket.to(userValidation.user).emit('mensaje-privado', { de: usuario.nombre });
-        socket.emit('mensaje-prueba', { de: usuario.nombre });
-        console.log('este es el final de todo el proceso');
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
