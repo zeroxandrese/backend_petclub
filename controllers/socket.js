@@ -1,4 +1,3 @@
-const { Notifications } = require('../models/index');
 const { Socket } = require('socket.io');
 const { verifyToken } = require('../helpers/generate-jwt');
 
