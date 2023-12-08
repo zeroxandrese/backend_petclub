@@ -29,7 +29,7 @@ const socketController = async (socket = new Socket()) => {
         const userValidation = await Image.findById(imgUid)
         const data = {
           userOwner: usuario._id,
-          imgUid: imgUid,
+          imgUid: userValidation._id,
           userSender: userValidation.user,
           event: "COMMENTS"
         };
