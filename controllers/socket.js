@@ -11,9 +11,9 @@ const socketController = async (socket = new Socket()) => {
     return socket.disconnect();
   }
 
-  const { _id } = await UserConnect.findOne(usuario._id);
-  if (_id) {
-    await UserConnect.findByIdAndDelete(_id);
+  const userValidationConnected = await UserConnect.findOne(usuario._id);
+  if (userValidationConnected) {
+    await UserConnect.findByIdAndDelete(userValidationConnected._id);
   }
   
   const data = {
