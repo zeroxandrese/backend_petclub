@@ -24,21 +24,19 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
 
   socket.on('notifications-comments', async ({ imgUid }) => {
-    console.log('este es el console del uid img', imgUid);
-    socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid)
         const data = {
           userOwner: usuario._id,
-          imgUid: imgUid.uid,
-          userSender: userValidation._id,
+          imgUid: imgUid,
+          userSender: userValidation.user,
           event: "COMMENTS"
         };
         const notifications = new Notifications(data);
         await notifications.save();
 
-        socket.to(userValidation._id).emit('mensaje-privado', { de: usuario.nombre });
+        socket.to(userValidation.user).emit('mensaje-privado', { de: usuario.nombre });
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
