@@ -2,7 +2,7 @@ const { Notifications } = require('../models/index');
 const { Socket } = require('socket.io');
 const { verifyToken } = require('../helpers/generate-jwt');
 
-const { UserConnect } = require('../models/index');
+const { UserConnect, Image } = require('../models/index');
 
 const socketController = async (socket = new Socket()) => {
 
@@ -21,26 +21,27 @@ const socketController = async (socket = new Socket()) => {
 
   socket.emit('prueba', 'Hola desde el servidor');
 
-  socket.on('recibir-comments', async ({ userOwner, imgUid, userSender, event }) => {
+  socket.on('notifications-comments', async ({ imgUid }) => {
     socket.emit('prueba', 'Hola desde el servidor');
-    /*     if (userOwner && imgUid && userSender && event) {
-          try {
-            const data = {
-              userOwner,
-              imgUid,
-              userSender,
-              event: "NOTIFICATIONS"
-            };
-            const notifications = new Notifications(data);
-            await notifications.save();
-    
-            res.status(201).json(notifications);
-          } catch (error) {
-            res.status(500).json({
-              msg: 'Algo salio mal, contacte con el administrador'
-            })
-          }
-        } */
+    if (imgUid) {
+      try {
+        const { user } = await Image.findById(imgUid)
+        const data = {
+          userOwner: usuario._id,
+          imgUid,
+          userSender: user._id,
+          event: "COMMENTS"
+        };
+        const notifications = new Notifications(data);
+        await notifications.save();
+
+        res.status(201).json(notifications);
+      } catch (error) {
+        res.status(500).json({
+          msg: 'Algo salio mal, contacte con el administrador'
+        })
+      }
+    }
   });
 
   socket.on('disconnect', async () => {
