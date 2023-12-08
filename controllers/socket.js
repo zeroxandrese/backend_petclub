@@ -28,11 +28,11 @@ const socketController = async (socket = new Socket()) => {
     socket.emit('prueba', 'Hola desde el servidor');
     if (imgUid) {
       try {
-        const { user } = await Image.findById(imgUid)
+        const userValidation = await Image.findById(imgUid)
         const data = {
           userOwner: usuario._id,
           imgUid,
-          userSender: user._id,
+          userSender: userValidation._id,
           event: "COMMENTS"
         };
         const notifications = new Notifications(data);
