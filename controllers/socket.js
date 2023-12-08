@@ -2,7 +2,7 @@ const { Notifications } = require('../models/index');
 const { Socket } = require('socket.io');
 const { verifyToken } = require('../helpers/generate-jwt');
 
-const { UserConnect, Image } = require('../models/index');
+const { UserConnect, Image, Notifications } = require('../models/index');
 
 const socketController = async (socket = new Socket()) => {
 
