@@ -37,6 +37,7 @@ const socketController = async (socket = new Socket()) => {
         await notifications.save();
 
         socket.to(userValidation.user).emit('mensaje-privado', { de: usuario.nombre });
+        socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
         console.log('final del proceso');
 
       } catch (error) {
