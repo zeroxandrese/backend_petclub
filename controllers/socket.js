@@ -26,7 +26,7 @@ const socketController = async (socket = new Socket()) => {
   socket.on('notifications-comments', async ({ imgUid }) => {
     if (imgUid) {
       try {
-        const userValidation = await Image.findById(imgUid)
+        const userValidation = await Image.findById(imgUid);
         const data = {
           userOwner: usuario._id,
           uidImg: userValidation._id,
@@ -36,7 +36,10 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });
+        if (userValidation) {
+          socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });     
+          console.log('si paso por dentro de uservalidation existe');
+        }
         socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
         console.log('uid del usuario dentro ya',userValidation.user.toString());
 
