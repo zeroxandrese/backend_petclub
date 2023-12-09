@@ -23,10 +23,8 @@ const socketController = async (socket = new Socket()) => {
   await userConnect.save();
   socket.join(usuario._id.toString());
   console.log('_id del usuario luego del join pero el typo',typeof(usuario._id.toString()));
-  console.log(Array.from(socket.rooms));
   const arrayFilter = Array.from(socket.rooms);
-  console.log(arrayFilter[1]);
-  console.log(typeof(arrayFilter[1]));
+  console.log(usuario._id.toString() === arrayFilter[1]);
 
   socket.on('notifications-comments', async ({ imgUid }) => {
     if (imgUid) {
@@ -41,7 +39,7 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        console.log(userValidation.user.toString() === socket.rooms[1]);
+        console.log(userValidation.user.toString() === arrayFilter[1]);
         socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });
         socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
         console.log('uid del usuario dentro ya',userValidation.user.toString());
