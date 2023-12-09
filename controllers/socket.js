@@ -38,10 +38,10 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        socket.to(userValidation.user).emit('mensaje-privado', { de: usuario.nombre });
+        socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });
         socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
-        console.log('uid del usuario dentro ya',userValidation.user);
-        console.log('uid del usuario dentro ya pero el typo',typeof(userValidation.user));
+        console.log('uid del usuario dentro ya',userValidation.user.toString());
+        console.log('uid del usuario dentro ya pero el typo',typeof(userValidation.user.toString()));
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
