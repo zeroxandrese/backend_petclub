@@ -21,9 +21,9 @@ const socketController = async (socket = new Socket()) => {
 
   const userConnect = new UserConnect(data);
   await userConnect.save();
-  socket.join(usuario._id);
-  console.log('_id del usuario luego del join',usuario._id);
-  console.log('_id del usuario luego del join pero el typo',typeof(usuario._id));
+  socket.join(usuario.id);
+  console.log('_id del usuario luego del join',usuario.id);
+  console.log('_id del usuario luego del join pero el typo',typeof(usuario.id));
 
   socket.on('notifications-comments', async ({ imgUid }) => {
     if (imgUid) {
