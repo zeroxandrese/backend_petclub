@@ -22,9 +22,6 @@ const socketController = async (socket = new Socket()) => {
   const userConnect = new UserConnect(data);
   await userConnect.save();
   socket.join(usuario._id.toString());
-  console.log('_id del usuario luego del join pero el typo',typeof(usuario._id.toString()));
-  const arrayFilter = Array.from(socket.rooms);
-  console.log(usuario._id.toString() === arrayFilter[1]);
 
   socket.on('notifications-comments', async ({ imgUid }) => {
     if (imgUid) {
@@ -39,11 +36,9 @@ const socketController = async (socket = new Socket()) => {
         const notifications = new Notifications(data);
         await notifications.save();
 
-        console.log(userValidation.user.toString() === arrayFilter[1]);
         socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });
         socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
         console.log('uid del usuario dentro ya',userValidation.user.toString());
-        console.log('uid del usuario dentro ya pero el typo',typeof(userValidation.user.toString()));
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
