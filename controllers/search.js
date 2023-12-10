@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const { User, Image, Pet } = require('../models/index');
+const { User, Image, Pet, Notifications } = require('../models/index');
 
 const collectionPermitidas = [
     'emails',
@@ -12,7 +12,8 @@ const collectionPermitidas = [
     'users',
     'images',
     'petsalluser',
-    'imagesLost'
+    'imagesLost',
+    'notifications',
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -53,7 +54,7 @@ const searchPetsImg = async (term = '', res = response) => {
 const searchEmailUser = async (term = '', res = response) => {
 
     const user = await User.findOne({
-        $or: [{ email: term}],
+        $or: [{ email: term }],
         $and: [{ status: true }]
     });
 
@@ -94,7 +95,7 @@ const searchPet = async (term = '', res = response) => {
     });
 
     res.status(201).json({
-        results: user
+        results: pet
     });
 };
 
@@ -111,7 +112,20 @@ const searchImages = async (term = '', res = response) => {
 
 };
 
-const searchImagesLost = async ( latPunto, lonPunto, res = response) => {
+const searchNotifications = async (term = '', res = response) => {
+
+    const notification = await Notifications.find({
+        $or: [{ userSender: term }],
+        $and: [{ status: true }]
+    });
+
+    res.status(201).json({
+        results: notification
+    });
+
+};
+
+const searchImagesLost = async (latPunto, lonPunto, res = response) => {
     const query = {
         $and: [
             { status: true },
@@ -134,7 +148,7 @@ const searchImagesLost = async ( latPunto, lonPunto, res = response) => {
     }
 
     res.status(201).json({
-         images
+        images
     });
 };
 
@@ -149,9 +163,9 @@ const searchGet = async (req, res = response) => {
     }
 
     switch (collection) {
-                case 'emails':
-                    searchEmailUser(term, res)
-                    break;
+        case 'emails':
+            searchEmailUser(term, res)
+            break;
         case 'petsalluser':
             searchPetsAllUser(term, res);
             break;
@@ -168,7 +182,10 @@ const searchGet = async (req, res = response) => {
             searchUsuarios(term, res);
             break;
         case 'imagesLost':
-            searchImagesLost( latPunto, lonPunto, res);
+            searchImagesLost(latPunto, lonPunto, res);
+            break;
+        case 'notifications':
+            searchNotifications(term, res);
             break;
 
         default:
