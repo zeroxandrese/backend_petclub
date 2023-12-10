@@ -27,6 +27,9 @@ const socketController = async (socket = new Socket()) => {
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid);
+        if(userValidation.user === usuario._id){
+          return null;
+        }
         const data = {
           userOwner: usuario._id,
           uidImg: userValidation._id,
