@@ -27,20 +27,19 @@ const socketController = async (socket = new Socket()) => {
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid);
-        if(userValidation.user === usuario._id){
-          return null;
-        }
-        const data = {
-          userOwner: usuario._id,
-          uidImg: userValidation._id,
-          userSender: userValidation.user,
-          event: "COMMENTS"
-        };
-        const notifications = new Notifications(data);
-        await notifications.save();
+        if (userValidation.user !== usuario._id) {
+          const data = {
+            userOwner: usuario._id,
+            uidImg: userValidation._id,
+            userSender: userValidation.user,
+            event: "COMMENTS"
+          };
+          const notifications = new Notifications(data);
+          await notifications.save();
 
-        if (userValidation) {
-          socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, imgUid });     
+          if (userValidation) {
+            socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, imgUid });
+          }
         }
 
       } catch (error) {
@@ -53,19 +52,20 @@ const socketController = async (socket = new Socket()) => {
     if (imgUid) {
       try {
         const userValidation = await Image.findById(imgUid);
-        const data = {
-          userOwner: usuario._id,
-          uidImg: userValidation._id,
-          userSender: userValidation.user,
-          event: "LIKES"
-        };
-        const notifications = new Notifications(data);
-        await notifications.save();
+        if (userValidation.user !== usuario._id) {
+          const data = {
+            userOwner: usuario._id,
+            uidImg: userValidation._id,
+            userSender: userValidation.user,
+            event: "LIKES"
+          };
+          const notifications = new Notifications(data);
+          await notifications.save();
 
-        if (userValidation) {
-          socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, imgUid });     
+          if (userValidation) {
+            socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, imgUid });
+          }
         }
-
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
       }
