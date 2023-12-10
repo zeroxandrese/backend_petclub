@@ -37,11 +37,31 @@ const socketController = async (socket = new Socket()) => {
         await notifications.save();
 
         if (userValidation) {
-          socket.to(userValidation.user.toString()).emit('mensaje-privado', { de: usuario.nombre });     
-          console.log('si paso por dentro de uservalidation existe');
+          socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, imgUid });     
         }
-        socket.emit('mensaje-prueba', { de: usuario.nombre, uid: usuario._id  });
-        console.log('uid del usuario dentro ya',userValidation.user.toString());
+
+      } catch (error) {
+        console.error('Error al desconectar el socket:', error);
+      }
+    }
+  });
+
+  socket.on('notifications-likes', async ({ imgUid }) => {
+    if (imgUid) {
+      try {
+        const userValidation = await Image.findById(imgUid);
+        const data = {
+          userOwner: usuario._id,
+          uidImg: userValidation._id,
+          userSender: userValidation.user,
+          event: "LIKES"
+        };
+        const notifications = new Notifications(data);
+        await notifications.save();
+
+        if (userValidation) {
+          socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, imgUid });     
+        }
 
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
