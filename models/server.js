@@ -34,6 +34,7 @@ class Server {
         this.reportPath = '/api/report';
         this.recoveryPasswordPath = '/api/recoveryPassword';
         this.recoveryPasswordCodePath = '/api/recoveryPasswordCode';
+        this.notificationsPath = '/api/notifications';
 
 
         // Conectar a base de datos
@@ -88,6 +89,7 @@ class Server {
         this.app.use(this.reportPath, require('../routes/report'));
         this.app.use(this.recoveryPasswordPath, require('../routes/recoveryPassword'));
         this.app.use(this.recoveryPasswordCodePath, require('../routes/recoveryPasswordCode'));
+        this.app.use(this.notificationsPath, require('../routes/notifications'));
     };
 
     sockets(){

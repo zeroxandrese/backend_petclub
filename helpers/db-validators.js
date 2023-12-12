@@ -1,4 +1,4 @@
-const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments, LikeCommentsChildren, ActionPlan } = require('../models/index');
+const { Image, Role, Tipo, Raza, Sexo, User, Comments, Alerts, Like, Pet, Report, CommentsChildren, LikeComments, LikeCommentsChildren, ActionPlan, Notifications } = require('../models/index');
 
 const isRole = async (role = "") => {
     const missingRole = await Role.findOne({ role });
@@ -51,6 +51,13 @@ const findEmail = async (email = "") => {
 
 const findId = async (id = "") => {
     const missingId = await User.findById(id);
+    if (!missingId) {
+        throw new Error('El id no se encuentra registrado');
+    }
+};
+
+const findIdNotifications = async (id = "") => {
+    const missingId = await Notifications.findById(id);
     if (!missingId) {
         throw new Error('El id no se encuentra registrado');
     }
@@ -160,5 +167,6 @@ module.exports = {
     findIdLikeComments,
     findIdComChild,
     findIdLikeCommentsChildren,
-    isActionPlan
+    isActionPlan,
+    findIdNotifications
 }
