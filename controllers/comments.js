@@ -12,6 +12,16 @@ const commentsGet = async (req, res = response) => {
         res.status(201).json(comments);
 };
 
+const commentsGetPaginate = async (req, res = response) => {
+    const id = req.params.id;
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 15 };
+    const query = { uidImg :id, status: true };
+
+    const comments = await Comments.paginate(query, options)
+        res.status(201).json(comments);
+};
+
 const twoCommentsGet = async (req, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
@@ -71,5 +81,6 @@ module.exports = {
     commentsPut,
     commentsPost,
     commentsDelete,
-    twoCommentsGet
+    twoCommentsGet,
+    commentsGetPaginate
 }
