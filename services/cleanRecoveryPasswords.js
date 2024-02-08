@@ -4,13 +4,13 @@ const { dbContection } = require('../database/config');
 
 require('dotenv').config();
 
-// Definir una tarea cron para ejecutar cada minuto (ajusta la programación según tus necesidades)
+// definicion de job cada minuto
 cron.schedule('* * * * *', async () => {
 
   try {
     await dbContection();
     
-    const cutoffTime = new Date(Date.now() - 4 * 60 * 1000); // Obtener la hora actual - 4 minutos
+    const cutoffTime = new Date(Date.now() - 4 * 60 * 1000);
 
     // Actualizacion de status de los registros cuya fecha de creación sea mayor a 4 minutos
    const result = await RecoveryPassword.updateMany(
