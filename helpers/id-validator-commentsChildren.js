@@ -6,7 +6,18 @@ const { CommentsChildren, Comments } = require('../models/index');
 const idValidatorComChil = async (req, res = response, next) => {
     const uid = await req.userAuth;
     const id = req.params.id;
+    if(id === 'undefined' || id === undefined || ''){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
     const validacionIdComChil = await CommentsChildren.findById(id);
+
+    if(validacionIdComChil === null){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
 
     const uid1 = JSON.stringify(uid._id);
     const uidUpdate = uid1.slice(1, -1);
@@ -50,7 +61,18 @@ const idValidatorComChilOwner = async (req, res = response, next) => {
         })
     }
     try {
+        if(id === 'undefined' || id === undefined || ''){
+            return res.status(400).json({
+                msg: 'ID no valido'
+            })
+        }
         const validacionIdCom = await CommentsChildren.findById(id);
+    
+        if(validacionIdCom === null){
+            return res.status(400).json({
+                msg: 'ID no valido'
+            })
+        }
         const validacionIdCom2 = validacionIdCom.uidCommentsFather;
         const validacionIdCom3 = await Comments.findById(validacionIdCom2);
         const uid1 = JSON.stringify(uid._id);

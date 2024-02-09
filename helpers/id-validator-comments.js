@@ -6,7 +6,18 @@ const { Comments, Image } = require('../models/index');
 const idValidatorCom = async (req, res = response, next) => {
     const uid = await req.userAuth;
     const id = req.params.id;
+    if(id === 'undefined' || id === undefined || ''){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
     const validacionIdCom = await Comments.findById(id);
+
+    if(validacionIdCom === null){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
 
     const uid1 = JSON.stringify(uid._id);
     const uidUpdate = uid1.slice(1, -1);
@@ -15,7 +26,7 @@ const idValidatorCom = async (req, res = response, next) => {
     const uidUpdate2 = uid2.slice(1, -1);
 
     if (!req.userAuth) {
-        return res.status(500).json({
+        return res.status(400).json({
             msg: 'Se intenta validar el id sin validar token'
         })
     }
@@ -45,12 +56,24 @@ const idValidatorComOwner = async (req, res = response, next) => {
     const id = req.params.id;
 
     if (!req.userAuth) {
-        return res.status(500).json({
+        return res.status(400).json({
             msg: 'Se intenta validar el id sin validar token'
         })
     }
     try {
+        if(id === 'undefined' || id === undefined || ''){
+            return res.status(400).json({
+                msg: 'ID no valido'
+            })
+        }
         const validacionIdCom = await Comments.findById(id);
+    
+        if(validacionIdCom === null){
+            return res.status(400).json({
+                msg: 'ID no valido'
+            })
+        }
+        
         const validacionIdCom2 = validacionIdCom.uidImg;
         const validacionIdCom3 = await Image.findById(validacionIdCom2);
         const uid1 = JSON.stringify(uid._id);

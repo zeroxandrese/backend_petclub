@@ -6,7 +6,18 @@ const { Notifications } = require('../models/index');
 const idValidatorNotifications = async (req, res = response, next) => {
     const uid = await req.userAuth;
     const id = req.params.id;
+    if(id === 'undefined' || id === undefined || ''){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
     const validacionIdNotifications = await Notifications.findById(id);
+
+    if(validacionIdNotifications === null){
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
 
     const uid1 = JSON.stringify(uid._id);
     const uidUpdate = uid1.slice(1, -1);

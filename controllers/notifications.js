@@ -8,7 +8,7 @@ const notificationsPut = async (req, res = response) => {
     if (!id) {
         return res.status(401).json({
             msg: 'Datos incompletos'
-        })
+        });
     }
     const notification = await Notifications.findByIdAndUpdate(id, { statusSeen: true });
 
