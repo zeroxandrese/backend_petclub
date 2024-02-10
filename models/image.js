@@ -2,53 +2,59 @@ const { Schema, model } = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
 const SchemaImg = Schema({
-     user:{
+    user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    pet:{
+    pet: {
         type: Schema.Types.ObjectId,
         ref: 'Pet'
     },
-    img:{
+    img: {
         type: String
     },
-    status:{
+    status: {
         type: Boolean,
         default: true,
         required: true
     },
-    descripcion:{
+    descripcion: {
         type: String
     },
-    charged:{
+    charged: {
         type: Date,
         default: Date.now
     },
-    actionPlan:{
+    actionPlan: {
         type: String,
         default: "IMAGE",
         required: true
     },
-    fechaEvento:{
+    fechaEvento: {
         type: Date
     },
-    longitudeEvento:{
+    longitudeEvento: {
         type: Number
     },
-    lantitudeEvento:{
+    lantitudeEvento: {
         type: Number
     },
-    horaEvento:{
+    horaEvento: {
         type: String
     },
-    namePet:{
+    namePet: {
+        type: String
+    },
+    finalUserVisibleAddress: {
+        type: String
+    },
+    finalUserVisibleDate: {
         type: String
     }
 });
 
-SchemaImg.methods.toJSON = function(){
+SchemaImg.methods.toJSON = function () {
     const { __v, _id, ...image } = this.toObject();
     image.uid = _id
     return image;

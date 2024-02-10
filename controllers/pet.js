@@ -5,13 +5,21 @@ cloudinary.config(process.env.CLOUDINARY_URL);
 const { Pet, Image } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
+const NodeGeocoder = require('node-geocoder');
+
+const options = {
+    provider: 'google',
+    apiKey: process.env.key,
+};
+
+
+const geocoder = NodeGeocoder(options);
 
 const petsGet = async (req, res = response) => {
     const { page } = req.query;
     const options = { page: page || 1, limit: 10 }
     const query = { status: true };
 
-    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de transacciones
     const pets = await Pet.paginate(query, options)
     res.status(201).json(pets);
 };
@@ -35,50 +43,65 @@ const petsGetAllOfUser = async (req, res = response) => {
 const petsPut = async (req, res = response) => {
     const id = req.params.id;
     const { ...pet } = req.body;
-    const { perdido, longitudePerdida, lantitudePerdida, fechaPerdida, horaPerdida } = req.body;
+    const { perdido, lantitudeEvento, fechaEvento, longitudeEvento, horaEvento } = req.body;
 
     try {
         const petPutValidation = await Pet.findById(id);
-        if (petPutValidation.perdido === false) {
-            if (perdido === true) {
-                const data = {
-                    user: petPutValidation.user,
-                    pet: id,
-                    img: petPutValidation.img,
-                    descripcion: petPutValidation.descripcion,
-                    actionPlan: "LOST",
-                    fechaEvento: fechaPerdida || new Date(),
-                    horaEvento: horaPerdida || '',
-                    longitudeEvento: longitudePerdida || 0,
-                    lantitudeEvento: lantitudePerdida || 0,
-                    namePet: petPutValidation.nombre
-                };
 
-                const image = new Image(data);
-                await image.save();
-            }
-        };
+        if (petPutValidation.perdido === false && perdido === true && longitudeEvento && lantitudeEvento && fechaEvento && horaEvento) {
+
+            const lantitudePerdidaNumber = parseInt(lantitudeEvento);
+            const longitudePerdidaNumber = parseInt(longitudeEvento);
+
+
+            const resAddress = await geocoder.reverse({ lat: lantitudePerdidaNumber, lon: longitudePerdidaNumber });
+
+            const dateLost = fechaEvento ? new Date(fechaEvento) : null;
+            const dayLost = dateLost?.getDate();
+            const monthNamesLost = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const monthIndexLost = dateLost?.getMonth() ?? null;
+            const yearLost = dateLost?.getFullYear();
+
+            const data = {
+                user: petPutValidation.user,
+                pet: id,
+                img: petPutValidation.img,
+                descripcion: petPutValidation.descripcion,
+                actionPlan: "LOST",
+                fechaEvento: fechaEvento || new Date(),
+                horaEvento: horaEvento || '',
+                longitudeEvento: longitudeEvento || 0,
+                lantitudeEvento: lantitudeEvento || 0,
+                namePet: petPutValidation.nombre,
+                finalUserVisibleAddress: resAddress[0].formattedAddress,
+                finalUserVisibleDate: `${dayLost} de ${monthNamesLost[monthIndexLost]} del ${yearLost}`
+            };
+
+            const image = new Image(data);
+            await image.save();
+
+            return res.status(201).json({ message: 'La mascota ha sido marcada como perdida correctamente.' });
+        }
 
         if (petPutValidation.perdido === true) {
             if (perdido === true) {
-                res.status(400).json({
-                    msg: 'La mascota ya fue reportada'
-                })
+                return res.status(400).json({ msg: 'La mascota ya fue reportada' });
             } else {
                 const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
                 }
+                return res.status(200).json({ message: 'La mascota ha sido encontrada.' });
             }
-        };
+        }
 
+        // Actualiza la mascota y envía una respuesta 201 Created
         const mascota = await Pet.findByIdAndUpdate(id, pet);
+        return res.status(201).json(mascota);
 
-        res.status(201).json(mascota);
     } catch (error) {
-        res.status(500).json({
-            msg: 'Algo salio mal, contacte con el administrador'
-        })
+        console.error('Error al procesar la solicitud:', error);
+        return res.status(500).json({ msg: 'Algo salió mal, contacte con el administrador' });
     }
 };
 
