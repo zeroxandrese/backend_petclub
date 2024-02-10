@@ -80,7 +80,10 @@ const petsPut = async (req, res = response) => {
             const image = new Image(data);
             await image.save();
 
-            return res.status(201).json({ message: 'La mascota ha sido marcada como perdida correctamente.' });
+            // Actualiza la mascota y envía una respuesta 201 Created
+            const mascota = await Pet.findByIdAndUpdate(id, pet);
+            return res.status(201).json(mascota);
+
         }
 
         if (petPutValidation.perdido === true) {
@@ -94,10 +97,6 @@ const petsPut = async (req, res = response) => {
                 return res.status(200).json({ message: 'La mascota ha sido encontrada.' });
             }
         }
-
-        // Actualiza la mascota y envía una respuesta 201 Created
-        const mascota = await Pet.findByIdAndUpdate(id, pet);
-        return res.status(201).json(mascota);
 
     } catch (error) {
         console.error('Error al procesar la solicitud:', error);
