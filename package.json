@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "clean": "node services/cleanRecoveryPasswords.js"
+    "clean": "node services/cleanRecoveryPasswords.js",
+    "notificationsClean": "node services/cleanNotifications.js"
   },
   "keywords": [],
   "author": "",
