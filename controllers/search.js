@@ -11,6 +11,7 @@ const collectionPermitidas = [
     'pets',
     'users',
     'images',
+    'imagesItem',
     'petsalluser',
     'imagesLost',
     'notifications',
@@ -108,6 +109,17 @@ const searchImages = async (term = '', res = response) => {
 
     res.status(201).json({
         results: image
+
+    });
+
+};
+
+const searchImagesItem = async (term = '', res = response) => {
+
+    const image = await Image.findById(term);
+
+    res.status(201).json({
+        results: image
     });
 
 };
@@ -177,6 +189,9 @@ const searchGet = async (req, res = response) => {
             break;
         case 'images':
             searchImages(term, res);
+            break;
+        case 'imagesItem':
+            searchImagesItem(term, res);
             break;
         case 'users':
             searchUsuarios(term, res);
