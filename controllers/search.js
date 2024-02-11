@@ -118,8 +118,8 @@ const searchImagesItem = async (term = '', res = response) => {
 
     const image = await Image.findById(term);
 
-    res.status(201).json({
-        results: image
+    return res.status(201).json({
+        results: (image) ? [image] : []
     });
 
 };
