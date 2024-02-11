@@ -38,7 +38,7 @@ const socketController = async (socket = new Socket()) => {
           await notifications.save();
 
           if (userValidation) {
-            socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, imgUid });
+            socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, userValidation });
           }
         }
 
@@ -63,7 +63,7 @@ const socketController = async (socket = new Socket()) => {
           await notifications.save();
 
           if (userValidation) {
-            socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, imgUid });
+            socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, userValidation });
           }
         }
       } catch (error) {
