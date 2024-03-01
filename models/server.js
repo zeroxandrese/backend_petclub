@@ -35,6 +35,7 @@ class Server {
         this.recoveryPasswordPath = '/api/recoveryPassword';
         this.recoveryPasswordCodePath = '/api/recoveryPasswordCode';
         this.notificationsPath = '/api/notifications';
+        this.deleteUserReasonsPath = '/api/deleteUserReasons';
 
 
         // Conectar a base de datos
@@ -90,6 +91,7 @@ class Server {
         this.app.use(this.recoveryPasswordPath, require('../routes/recoveryPassword'));
         this.app.use(this.recoveryPasswordCodePath, require('../routes/recoveryPasswordCode'));
         this.app.use(this.notificationsPath, require('../routes/notifications'));
+        this.app.use(this.deleteUserReasonsPath, require('../routes/deleteUserReasons'));
     };
 
     sockets(){
