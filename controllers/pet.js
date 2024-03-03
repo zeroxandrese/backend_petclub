@@ -43,7 +43,7 @@ const petsGetAllOfUser = async (req, res = response) => {
 const petsPut = async (req, res = response) => {
     const id = req.params.id;
     const { ...pet } = req.body;
-    const { perdido, lantitudeEvento, fechaEvento, longitudeEvento, horaEvento } = req.body;
+    const { perdido, lantitudeEvento, fechaEvento, longitudeEvento, horaEvento, nombre, sexo, tipo, edad, raza, descripcion } = req.body;
 
     try {
         const petPutValidation = await Pet.findById(id);
@@ -88,15 +88,21 @@ const petsPut = async (req, res = response) => {
 
         if (petPutValidation.perdido === true) {
             if (perdido === true) {
-                return res.status(400).json({ msg: 'La mascota ya fue reportada' });
+                return res.status(400).json({ msg: 'La mascota ya fue reportada.' });
             } else {
                 const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
                 }
-                return res.status(200).json({ message: 'La mascota ha sido encontrada.' });
+                return res.status(201).json({ message: 'La mascota ha sido encontrada y/o no puede ser editada.' });
             }
         }
+
+        if (nombre || sexo || tipo || edad || raza || descripcion) {
+            const pets = await Pet.findByIdAndUpdate(petPutValidation, pet);
+            return res.status(201).json({ pets });
+        }
+        
 
     } catch (error) {
         console.error('Error al procesar la solicitud:', error);
