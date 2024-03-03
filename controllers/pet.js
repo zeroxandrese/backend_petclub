@@ -93,6 +93,7 @@ const petsPut = async (req, res = response) => {
                 const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
+                    await Pet.findByIdAndUpdate(id, pet);
                 }
                 return res.status(201).json({ message: 'La mascota ha sido encontrada y/o no puede ser editada.' });
             }
