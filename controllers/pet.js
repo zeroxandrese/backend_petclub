@@ -29,15 +29,15 @@ const petsGetOneOfUser = async (req, res = response) => {
 
     // Se busca al un id de mascota es especifico
     const pet = await Pet.findById(id);
-    res.status(201).json(pet);
+    res.status(201).json({ pet });
 };
 
 const petsGetAllOfUser = async (req, res = response) => {
     const id = req.params.id;
 
     // Se busca al un id de mascota es especifico
-    const pets = await Pet.find({ id });
-    res.status(201).json(pets);
+    const pet = await Pet.find({ id });
+    res.status(201).json({ pet });
 };
 
 const petsPut = async (req, res = response) => {
@@ -81,8 +81,8 @@ const petsPut = async (req, res = response) => {
             await image.save();
 
             // Actualiza la mascota y envía una respuesta 201 Created
-            const mascota = await Pet.findByIdAndUpdate(id, pet);
-            return res.status(201).json(mascota);
+            const mascota = await Pet.findByIdAndUpdate(id, pet, { new: true }); 
+            return res.status(201).json({pet: mascota});
 
         }
 
@@ -90,18 +90,18 @@ const petsPut = async (req, res = response) => {
             if (perdido === true) {
                 return res.status(400).json({ msg: 'La mascota ya fue reportada.' });
             } else {
+                await Pet.findByIdAndUpdate(id, pet, { new: true });
                 const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
-                    await Pet.findByIdAndUpdate(id, pet);
                 }
                 return res.status(201).json({ message: 'La mascota ha sido encontrada y/o no puede ser editada.' });
             }
         }
 
         if (nombre || sexo || tipo || edad || raza || descripcion) {
-            const pets = await Pet.findByIdAndUpdate(petPutValidation, pet);
-            return res.status(201).json({ pets });
+            const pets = await Pet.findByIdAndUpdate(petPutValidation._id, pet, { new: true });
+            return res.status(201).json({ pet: pets });
         }
         
 
@@ -158,9 +158,9 @@ const petsDelete = async (req, res = response) => {
     //const usuario = await User.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const mascota = await Pet.findByIdAndUpdate(id, { status: false });
+    const pet = await Pet.findByIdAndUpdate(id, { status: false });
 
-    res.status(201).json({ mascota });
+    res.status(201).json({ pet });
 };
 
 module.exports = {

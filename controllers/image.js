@@ -22,7 +22,7 @@ const imagesPut = async (req, res = response) => {
   const id = req.params.id;
   const { status, img, ...image } = req.body;
 
-  const imagen = await Image.findByIdAndUpdate(id, image);
+  const imagen = await Image.findByIdAndUpdate(id, image, { new: true });
 
   res.status(201).json(imagen);
 };

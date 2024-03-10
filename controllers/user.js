@@ -24,7 +24,7 @@ const usersPut = async (req, res = response) => {
         user.password = bcryptjs.hashSync(password, salt);
     }
 
-    const usuario = await User.findByIdAndUpdate(uid1, user);
+    const usuario = await User.findOneAndUpdate({_id: uid1}, user, { new: true });
 
     res.status(201).json(usuario);
 };
