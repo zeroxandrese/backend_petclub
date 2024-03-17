@@ -66,13 +66,29 @@ const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
 } */
 
 const cloudinaryUploadFile = async (req, res = response) => {
+    const uid = await req.userAuth;
     const { id, collection } = req.params;
 
     let modelo;
+    if (id === 'undefined' || id === undefined || '') {
+        return res.status(400).json({
+            msg: 'ID no valido'
+        })
+    }
+
+    const uid1 = JSON.stringify(uid._id);
+    const uidUpdate = uid1.slice(1, -1);
 
     switch (collection) {
         case 'users':
-            modelo = await User.findById(id)
+            modelo = await User.findById(id);
+            const uid3 = JSON.stringify(modelo._id);
+            const uidUpdate3 = uid3.slice(1, -1);
+            if (uidUpdate3 !== uidUpdate) {
+                return res.status(401).json({
+                    msg: 'El uid no corresponde'
+                });
+            }
             if (!modelo) {
                 return res.status(400).json({
                     msg: 'El uuid no existe'
@@ -89,6 +105,13 @@ const cloudinaryUploadFile = async (req, res = response) => {
             break;
         case 'pets':
             modelo = await Pet.findById(id)
+            const uid2 = JSON.stringify(modelo.user);
+            const uidUpdate2 = uid2.slice(1, -1);
+            if (uidUpdate2 !== uidUpdate) {
+                return res.status(401).json({
+                    msg: 'El uid no corresponde'
+                });
+            }
             if (!modelo) {
                 return res.status(400).json({
                     msg: 'El uuid no existe'

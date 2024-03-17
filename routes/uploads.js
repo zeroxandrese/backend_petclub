@@ -6,7 +6,6 @@ const { collectionAllowed } = require('../helpers/db-validators');
 const { validarJWT } = require('../middelwares/validar-jwt');
 const { validarCampos } = require('../middelwares/validar-campos');
 const { verifyUploadFile } = require('../middelwares/validar-archivo')
-const { idValidator } = require('../helpers/id-validator');
 const router = Router();
 
 router.get('/:collection/:id',[
@@ -19,7 +18,6 @@ router.get('/:collection/:id',[
 
 router.put('/:collection/:id',[
     validarJWT,
-    idValidator,
     verifyUploadFile,
     check('id','El id no es valido').isMongoId(),
     check('collection').custom( c=> collectionAllowed(c, ['users','images','pets'])),
