@@ -1,8 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const fileUpload = require('express-fileupload');
 const { dbContection } = require('../database/config');
 const { socketController } = require('../controllers/socket');
+
+const limiter = rateLimit({
+    max: 200,
+    windowMs: 2 * 60 * 1000,
+    message: 'Has superado la cantidad de solicitudes permitidas'
+})
 
 class Server {
 
@@ -58,6 +65,9 @@ class Server {
     middlewares() {
         //Cors para restringir peticiones
         this.app.use(cors());
+
+        //rateLimit para limitar peticiones por minuto
+        this.app.use('/api', limiter);
 
         // parseo y lectura del body
         this.app.use(express.json());
