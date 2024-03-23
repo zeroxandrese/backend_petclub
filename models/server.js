@@ -65,6 +65,9 @@ class Server {
     middlewares() {
         //Cors para restringir peticiones
         this.app.use(cors());
+        
+        //Configuracion de encabezados proxys
+        this.app.set('trust proxy', true);
 
         //rateLimit para limitar peticiones por minuto
         this.app.use('/api', limiter);
