@@ -67,7 +67,7 @@ class Server {
         this.app.use(cors());
         
         //Configuracion de encabezados proxys
-        this.app.set('trust proxy', true);
+        this.app.set('trust proxy', 1);
 
         //rateLimit para limitar peticiones por minuto
         this.app.use('/api', limiter);
