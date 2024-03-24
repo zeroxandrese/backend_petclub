@@ -50,12 +50,10 @@ const petsPut = async (req, res = response) => {
 
         if (petPutValidation.perdido === false && perdido === true && longitudeEvento && lantitudeEvento && fechaEvento && horaEvento) {
 
-            const lantitudePerdidaNumber = parseInt(lantitudeEvento);
-            const longitudePerdidaNumber = parseInt(longitudeEvento);
-
+            const lantitudePerdidaNumber = parseFloat(lantitudeEvento);
+            const longitudePerdidaNumber = parseFloat(longitudeEvento);
 
             const resAddress = await geocoder.reverse({ lat: lantitudePerdidaNumber, lon: longitudePerdidaNumber });
-
             const dateLost = fechaEvento ? new Date(fechaEvento) : null;
             const dayLost = dateLost?.getDate();
             const monthNamesLost = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -103,7 +101,6 @@ const petsPut = async (req, res = response) => {
             const pets = await Pet.findByIdAndUpdate(petPutValidation._id, pet, { new: true });
             return res.status(201).json({ pet: pets });
         }
-        
 
     } catch (error) {
         console.error('Error al procesar la solicitud:', error);
