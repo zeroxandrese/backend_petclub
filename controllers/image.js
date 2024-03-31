@@ -59,6 +59,17 @@ const imagesPost = async (req, res = response) => {
       }
     ];
 
+    const commonTransformationBig = [
+      { width: 1000, height: 506, crop: "scale" },
+      { quality: "auto" },
+      {
+        format: 'jpg',
+        transformation: [
+          { width: 390, height: 506, crop: 'scale' },
+        ]
+      }
+    ];
+
     function getFileSize(filePath) {
       const stats = fs.statSync(filePath);
       return stats.size;
@@ -79,7 +90,7 @@ const imagesPost = async (req, res = response) => {
       const videoUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         resource_type: 'video',
         chunk_size: 6000000,
-        eager: commonTransformationLitt
+        eager: [commonTransformationLitt, commonTransformationBig]
       });
 
       const data = {
