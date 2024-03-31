@@ -6,16 +6,45 @@ const fs = require('fs');
 const { Image } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
-const imagesGet = async (req, res = response) => {
-  const { page } = req.query;
-  const options = { page: page || 1, limit: 20 }
-  const query = { status: true };
+const shuffle = (array) => {
+  let currentIndex = array.length, randomIndex, temporaryValue;
 
-  // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
-  const imagenes = await Image.paginate(query, options)
-  res.status(201).json(imagenes)
+  // Mientras haya elementos para mezclar
+  while (currentIndex !== 0) {
+    // Selecciona un elemento restante
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // Intercambia el elemento seleccionado con el actual
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 };
 
+const imagesGet = async (req, res = response) => {
+  try {
+    const { page } = req.query;
+    const options = { page: page || 1, limit: 20 };
+    const query = { status: true };
+
+    // Obtener todas las imágenes disponibles para la página solicitada
+    const images = await Image.paginate(query, options);
+
+    // Mezclar las imágenes obtenidas
+    const shuffledImages = shuffle(images.docs);
+
+    // Reemplazar las imágenes mezcladas en la respuesta
+    images.docs = shuffledImages;
+
+    res.status(200).json(images);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 const imagesPut = async (req, res = response) => {
 
