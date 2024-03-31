@@ -6,7 +6,7 @@ const { dbContection } = require('../database/config');
 const { socketController } = require('../controllers/socket');
 
 const limiter = rateLimit({
-    max: 200,
+    max: 350,
     windowMs: 2 * 60 * 1000,
     message: 'Has superado la cantidad de solicitudes permitidas'
 })

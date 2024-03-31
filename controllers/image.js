@@ -8,7 +8,7 @@ const { uploadFileValidation } = require('../helpers/upload-file');
 
 const imagesGet = async (req, res = response) => {
   const { page } = req.query;
-  const options = { page: page || 1, limit: 10 }
+  const options = { page: page || 1, limit: 20 }
   const query = { status: true };
 
   // se estan enviando dos promesas al mismo tiempo para calcular el paginado de imagenes
@@ -59,17 +59,6 @@ const imagesPost = async (req, res = response) => {
       }
     ];
 
-    const commonTransformationBig = [
-      { width: 1000, height: 506, crop: "scale" },
-      { quality: "auto" },
-      {
-        format: 'jpg',
-        transformation: [
-          { width: 390, height: 506, crop: 'scale' },
-        ]
-      }
-    ];
-
     function getFileSize(filePath) {
       const stats = fs.statSync(filePath);
       return stats.size;
@@ -90,7 +79,7 @@ const imagesPost = async (req, res = response) => {
       const videoUploadResult = await cloudinary.uploader.upload(tempFilePath, {
         resource_type: 'video',
         chunk_size: 6000000,
-        eager: [commonTransformationLitt, commonTransformationBig]
+         eager: commonTransformationLitt
       });
 
       const data = {
