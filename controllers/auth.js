@@ -11,6 +11,12 @@ const verifyToken = async (req, res = response) => {
     const uid = await req.userAuth;
 
     try {
+        if (!uid) {
+            return res.status(400).json({
+                msg: 'El token no se ha validado'
+            });
+        }
+
         res.status(201).json({
             user: uid
         });
@@ -28,14 +34,15 @@ const login = async (req, res = response) => {
     const { email, password } = req.body;
 
     try {
-        // Validacion correo existe?
+        // Validacion correo 
         const user = await User.findOne({ email });
+        
         if (!user) {
             return res.status(400).json({
                 msg: 'El email / Password son incorrectos'
             });
         }
-        //Validacion usuario activo?
+        //Validacion usuario activo
         if (!user.status) {
             return res.status(400).json({
                 msg: 'El email / Password son incorrectos'

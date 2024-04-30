@@ -9,7 +9,7 @@ const { validarJWT } = require('../middelwares/validar-jwt');
 
 const router = Router();
 
-router.get('/verify', [
+router.post('/verify', [
     validarJWT
 ], verifyToken);
 

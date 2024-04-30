@@ -28,7 +28,7 @@ const imagesGet = async (req, res = response) => {
   try {
     const { page } = req.query;
     const options = { page: page || 1, limit: 20 };
-    const query = { status: true };
+    const query = { status: true, charged: -1 };
 
     // Obtener todas las imágenes disponibles para la página solicitada
     const images = await Image.paginate(query, options);

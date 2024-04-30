@@ -5,7 +5,7 @@ const { dbContection } = require('../database/config');
 require('dotenv').config();
 
 // definicion de job cada minuto
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 */2 * * *', async () => {
 
   try {
     await dbContection();

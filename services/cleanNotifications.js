@@ -4,7 +4,7 @@ const { dbContection } = require('../database/config');
 
 require('dotenv').config();
 
-// definicion de job uan vez al dia a media noche
+// definicion de job una vez al dia a media noche
 cron.schedule('0 0 * * *', async () => {
 
   try {

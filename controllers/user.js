@@ -32,7 +32,8 @@ const usersPut = async (req, res = response) => {
 const usersPost = async (req, res = response) => {
 
     const { nombre, sexo, password, email, latitude, longitude, edad, role, status, google } = req.body;
-    const user = new User({ nombre, sexo, password, email, latitude, longitude, edad, role, status, google });
+
+    const user = new User({ nombre, sexo, password, email , latitude, longitude, edad, role, status, google });
 
     //Encriptado del password
     const salt = bcryptjs.genSaltSync();
