@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const { User, Image, Pet, Notifications } = require('../models/index');
+const { User, Image, Pet, Notifications, ElementMapRefugios } = require('../models/index');
 
 const collectionPermitidas = [
     'emails',
@@ -15,6 +15,7 @@ const collectionPermitidas = [
     'petsalluser',
     'imagesLost',
     'notifications',
+    'refugios'
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -150,7 +151,7 @@ const searchImagesLost = async (latPunto, lonPunto, res = response) => {
     // Verifica si se proporcionaron las coordenadas del punto de referencia
     if (latPunto && lonPunto) {
         // Filtra las imágenes por distancia usando las coordenadas proporcionadas
-        const radioKm = 2; // variable de KM a la redonda
+        const radioKm = 3; // variable de KM a la redonda
         const imagesFiltradas = images.filter(image => {
             const distancia = calcularDistancia(latPunto, lonPunto, image.lantitudeEvento, image.longitudeEvento);
             return distancia <= radioKm;
@@ -161,6 +162,32 @@ const searchImagesLost = async (latPunto, lonPunto, res = response) => {
 
     res.status(201).json({
         images
+    });
+};
+
+const searchRefugios = async (latPunto, lonPunto, res = response) => {
+    const query = {
+        $and: [
+            { status: true }
+        ]
+    };
+
+    const elementMapRefugios = await ElementMapRefugios.find(query);
+
+    // Verifica si se proporcionaron las coordenadas del punto de referencia
+    if (latPunto && lonPunto) {
+        // Filtra las imágenes por distancia usando las coordenadas proporcionadas
+        const radioKm = 3; // variable de KM a la redonda
+        const elementMapRefugiosFilter = elementMapRefugios.filter(elementMapRefugio => {
+            const distancia = calcularDistancia(latPunto, lonPunto, elementMapRefugio.lantitude, elementMapRefugio.longitude);
+            return distancia <= radioKm;
+        });
+
+        elementMapRefugios = elementMapRefugiosFilter;
+    }
+
+    res.status(201).json({
+        elementMapRefugios
     });
 };
 
@@ -198,6 +225,9 @@ const searchGet = async (req, res = response) => {
             break;
         case 'imagesLost':
             searchImagesLost(latPunto, lonPunto, res);
+            break;
+        case 'refugios':
+            searchRefugios(latPunto, lonPunto, res);
             break;
         case 'notifications':
             searchNotifications(term, res);

@@ -6,7 +6,7 @@ const { dbContection } = require('../database/config');
 const { socketController } = require('../controllers/socket');
 
 const limiter = rateLimit({
-    max: 350,
+    max: 150,
     windowMs: 2 * 60 * 1000,
     message: 'Has superado la cantidad de solicitudes permitidas'
 })
@@ -43,7 +43,7 @@ class Server {
         this.recoveryPasswordCodePath = '/api/recoveryPasswordCode';
         this.notificationsPath = '/api/notifications';
         this.deleteUserReasonsPath = '/api/deleteUserReasons';
-
+        this.profileRefugiosPath = '/api/profileRefugios';
 
         // Conectar a base de datos
         this.conectarDB();
@@ -105,6 +105,7 @@ class Server {
         this.app.use(this.recoveryPasswordCodePath, require('../routes/recoveryPasswordCode'));
         this.app.use(this.notificationsPath, require('../routes/notifications'));
         this.app.use(this.deleteUserReasonsPath, require('../routes/deleteUserReasons'));
+        this.app.use(this.profileRefugiosPath, require('../routes/profileRefugios'));
     };
 
     sockets(){

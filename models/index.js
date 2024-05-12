@@ -23,7 +23,9 @@ const Report = require('./report');
 const RecoveryPassword = require('./recoveryPassword');
 const Notifications = require('./notifications');
 const UserConnect = require('./userConnect');
-const DeleteUserReasons = require('./deleteUserReasons')
+const DeleteUserReasons = require('./deleteUserReasons');
+const ProfileRefugios = require('./profileRefugios');
+const ElementMapRefugios = require('./elementMapRefugios');
 
 module.exports = {
 User,
@@ -47,6 +49,8 @@ RecoveryPassword,
 ActionPlan,
 Notifications,
 UserConnect,
-DeleteUserReasons
+DeleteUserReasons,
+ProfileRefugios,
+ElementMapRefugios
 }
 
