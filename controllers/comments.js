@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 
-const { Comments } = require('../models/index');
+const { Comments, PawsCount, TokenPoint } = require('../models/index');
 
 const commentsGet = async (req, res = response) => {
     const id = req.params.id;
@@ -61,6 +61,42 @@ const commentsPost = async (req, res = response) => {
     const comment = new Comments(data);
 
     await comment.save();
+
+    const idResult = await PawsCount.findOne({ user: uid._id });
+
+    if (!idResult) {
+        const dataPaw = {
+            user: uid._id,
+            paws: 1,
+            lastUpdate: Date.now()
+        }
+
+        const paws = new PawsCount(dataPaw);
+
+        await paws.save();
+    } else {
+
+        await PawsCount.findByIdAndUpdate(idResult._id, { paws: idResult.paws + 1, lastUpdate: Date.now() });
+
+    }
+
+    const idResultPoint = await TokenPoint.findOne({ user: uid._id });
+
+    if (!idResultPoint) {
+        const dataPoint = {
+            user: uid._id,
+            points: 10,
+            lastUpdate: Date.now()
+        }
+
+        const point = new TokenPoint(dataPoint);
+
+        await point.save();
+    } else {
+
+        await TokenPoint.findByIdAndUpdate(idResultPoint._id, { points: idResultPoint.points + 10, lastUpdate: Date.now() });
+
+    }
 
     res.status(201).json(comment);
 };

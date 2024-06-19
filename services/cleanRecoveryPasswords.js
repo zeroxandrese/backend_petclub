@@ -4,7 +4,7 @@ const { dbContection } = require('../database/config');
 
 require('dotenv').config();
 
-// definicion de job cada minuto
+// definicion de job cada 2 horas
 cron.schedule('0 */2 * * *', async () => {
 
   try {
@@ -12,7 +12,7 @@ cron.schedule('0 */2 * * *', async () => {
     
     const cutoffTime = new Date(Date.now() - 4 * 60 * 1000);
 
-    // Actualizacion de status de los registros cuya fecha de creación sea mayor a 4 minutos
+    // Actualizacion de status de los codigos
    const result = await RecoveryPassword.updateMany(
       { charged: { $lte: cutoffTime } },
       { $set: { status: false } },

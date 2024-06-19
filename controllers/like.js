@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 
-const { Like } = require('../models/index');
+const { Like, PawsCount, TokenPoint } = require('../models/index');
 
 const likeGet = async (req, res = response) => {
     const id = req.params.id;
@@ -10,7 +10,7 @@ const likeGet = async (req, res = response) => {
 
     // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
     const like = await Like.paginate(query, options)
-        res.status(201).json(like);
+    res.status(201).json(like);
 };
 
 const likePost = async (req, res = response) => {
@@ -32,6 +32,42 @@ const likePost = async (req, res = response) => {
     const likes = new Like(data);
 
     await likes.save();
+
+    const idResult = await PawsCount.findOne({ user: uid._id });
+
+    if (!idResult) {
+        const dataPaw = {
+            user: uid._id,
+            paws: 1,
+            lastUpdate: Date.now()
+        }
+
+        const paws = new PawsCount(dataPaw);
+
+        await paws.save();
+    } else {
+
+        await PawsCount.findByIdAndUpdate(idResult._id, { paws: idResult.paws + 1, lastUpdate: Date.now() });
+
+    }
+
+    const idResultPoint = await TokenPoint.findOne({ user: uid._id });
+
+    if (!idResultPoint) {
+        const dataPoint = {
+            user: uid._id,
+            points: 5,
+            lastUpdate: Date.now()
+        }
+
+        const point = new TokenPoint(dataPoint);
+
+        await point.save();
+    } else {
+
+        await TokenPoint.findByIdAndUpdate(idResultPoint._id, { points: idResultPoint.points + 5, lastUpdate: Date.now() });
+
+    }
 
     res.status(201).json(likes);
 };

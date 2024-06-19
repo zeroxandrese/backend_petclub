@@ -2,7 +2,7 @@ const { response, query } = require('express');
 const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
-const { Pet, Image } = require('../models/index');
+const { Pet, Image, PawsCount, TokenPoint } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
 const NodeGeocoder = require('node-geocoder');
@@ -79,8 +79,8 @@ const petsPut = async (req, res = response) => {
             await image.save();
 
             // Actualiza la mascota y envía una respuesta 201 Created
-            const mascota = await Pet.findByIdAndUpdate(id, pet, { new: true }); 
-            return res.status(201).json({pet: mascota});
+            const mascota = await Pet.findByIdAndUpdate(id, pet, { new: true });
+            return res.status(201).json({ pet: mascota });
 
         }
 
@@ -93,7 +93,7 @@ const petsPut = async (req, res = response) => {
                 if (resp) {
                     await Image.findByIdAndUpdate(resp._id, { status: false });
                 }
-                return res.status(201).json({pet: mascota});
+                return res.status(201).json({ pet: mascota });
             }
         }
 
@@ -138,6 +138,42 @@ const petsPost = async (req, res = response) => {
 
         await pet.save();
 
+        const idResult = await PawsCount.findOne({ user: uid._id });
+
+        if (!idResult) {
+            const dataPaw = {
+                user: uid._id,
+                paws: 5,
+                lastUpdate: Date.now()
+            }
+
+            const paws = new PawsCount(dataPaw);
+
+            await paws.save();
+        } else {
+
+            await PawsCount.findByIdAndUpdate(idResult._id, { paws: idResult.paws + 5, lastUpdate: Date.now() });
+
+        }
+
+        const idResultPoint = await TokenPoint.findOne({ user: uid._id });
+
+        if (!idResultPoint) {
+            const dataPoint = {
+                user: uid._id,
+                points: 50,
+                lastUpdate: Date.now()
+            }
+    
+            const point = new TokenPoint(dataPoint);
+    
+            await point.save();
+        } else {
+    
+            await TokenPoint.findByIdAndUpdate(idResultPoint._id, { points: idResultPoint.points + 50, lastUpdate: Date.now() });
+    
+        }    
+
         res.status(201).json({
             pet
         });
@@ -155,7 +191,7 @@ const petsDelete = async (req, res = response) => {
     //const usuario = await User.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const pet = await Pet.findByIdAndUpdate(id, { status: false });
+    const pet = await Pet.findByIdAndUpdate(id, { status: false, new: true });
 
     res.status(201).json({ pet });
 };

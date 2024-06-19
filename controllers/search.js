@@ -1,6 +1,6 @@
 const { response, query } = require('express');
 const { ObjectId } = require('mongoose').Types;
-const { User, Image, Pet, Notifications, ElementMapRefugios } = require('../models/index');
+const { User, Image, Pet, Notifications, ElementMapRefugios, PawsCount } = require('../models/index');
 
 const collectionPermitidas = [
     'emails',
@@ -15,7 +15,8 @@ const collectionPermitidas = [
     'petsalluser',
     'imagesLost',
     'notifications',
-    'refugios'
+    'refugios',
+    'pawsCount'
 ]
 
 const searchUsuarios = async (term = '', res = response) => {
@@ -138,6 +139,18 @@ const searchNotifications = async (term = '', res = response) => {
 
 };
 
+const searchPawsCount = async (term = '', res = response) => {
+
+    const pawCount = await PawsCount.find({
+        $or: [{ user: term }]
+    });
+    
+    res.status(201).json({
+        results: pawCount
+    });
+
+};
+
 const searchImagesLost = async (latPunto, lonPunto, res = response) => {
     const query = {
         $and: [
@@ -231,6 +244,9 @@ const searchGet = async (req, res = response) => {
             break;
         case 'notifications':
             searchNotifications(term, res);
+            break;
+        case 'pawsCount':
+            searchPawsCount(term, res);
             break;
 
         default:

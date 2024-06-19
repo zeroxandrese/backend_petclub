@@ -26,6 +26,8 @@ const UserConnect = require('./userConnect');
 const DeleteUserReasons = require('./deleteUserReasons');
 const ProfileRefugios = require('./profileRefugios');
 const ElementMapRefugios = require('./elementMapRefugios');
+const PawsCount = require('./pawsCount');
+const TokenPoint = require('./tokenPoint');
 
 module.exports = {
 User,
@@ -51,6 +53,8 @@ Notifications,
 UserConnect,
 DeleteUserReasons,
 ProfileRefugios,
-ElementMapRefugios
+ElementMapRefugios,
+PawsCount,
+TokenPoint
 }
 

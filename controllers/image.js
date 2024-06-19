@@ -3,7 +3,7 @@ const cloudinary = require('cloudinary').v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 const fs = require('fs');
 
-const { Image } = require('../models/index');
+const { Image, PawsCount, TokenPoint } = require('../models/index');
 const { uploadFileValidation } = require('../helpers/upload-file');
 
 const shuffle = (array) => {
@@ -121,6 +121,42 @@ const imagesPost = async (req, res = response) => {
       const image = new Image(data);
       await image.save();
 
+      const idResult = await PawsCount.findOne({ user: uid._id });
+
+      if (!idResult) {
+          const dataPaw = {
+              user: uid._id,
+              paws: 2,
+              lastUpdate: Date.now()
+          }
+  
+          const paws = new PawsCount(dataPaw);
+  
+          await paws.save();
+      } else {
+  
+          await PawsCount.findByIdAndUpdate(idResult._id, { paws: idResult.paws + 2, lastUpdate: Date.now() });
+  
+      }
+
+      const idResultPoint = await TokenPoint.findOne({ user: uid._id });
+
+      if (!idResultPoint) {
+          const dataPoint = {
+              user: uid._id,
+              points: 25,
+              lastUpdate: Date.now()
+          }
+  
+          const point = new TokenPoint(dataPoint);
+  
+          await point.save();
+      } else {
+  
+          await TokenPoint.findByIdAndUpdate(idResultPoint._id, { points: idResultPoint.points + 25, lastUpdate: Date.now() });
+  
+      }
+
       res.status(201).json(image);
     } else {
       // Subir imagen a Cloudinary con transformaciones
@@ -137,6 +173,42 @@ const imagesPost = async (req, res = response) => {
 
       const image = new Image(data);
       await image.save();
+
+      const idResult = await PawsCount.findOne({ user: uid._id });
+
+      if (!idResult) {
+          const dataPaw = {
+              user: uid._id,
+              paws: 1,
+              lastUpdate: Date.now()
+          }
+  
+          const paws = new PawsCount(dataPaw);
+  
+          await paws.save();
+      } else {
+  
+          await PawsCount.findByIdAndUpdate(idResult._id, { paws: idResult.paws + 1, lastUpdate: Date.now() });
+  
+      }
+
+      const idResultPoint = await TokenPoint.findOne({ user: uid._id });
+
+      if (!idResultPoint) {
+          const dataPoint = {
+              user: uid._id,
+              points: 10,
+              lastUpdate: Date.now()
+          }
+  
+          const point = new TokenPoint(dataPoint);
+  
+          await point.save();
+      } else {
+  
+          await TokenPoint.findByIdAndUpdate(idResultPoint._id, { points: idResultPoint.points + 10, lastUpdate: Date.now() });
+  
+      }
 
       res.status(201).json(image);
     }
