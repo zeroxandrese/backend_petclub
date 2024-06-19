@@ -9,6 +9,303 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("MONGODB_CNN")
+}
+
+model Image {
+  uid                     String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId                  String          @db.ObjectId
+  user                    User            @relation(fields: [userId], references: [uid])
+  petId                   String?         @db.ObjectId
+  pet                     Pet?            @relation(fields: [petId], references: [uid])
+  img                     String?
+  status                  Boolean         @default(true)
+  descripcion             String?
+  charged                 DateTime        @default(now())
+  actionPlan              String          @default("IMAGE")
+  fechaEvento             DateTime?
+  longitudeEvento         Float?
+  lantitudeEvento         Float?
+  horaEvento              String?
+  namePet                 String?
+  finalUserVisibleAddress String?
+  finalUserVisibleDate    String?
+  alerts                  Alerts[]
+  likes                   Like[]
+  Notifications           Notifications[]
+  Comments                Comments[]
+
+  @@index([userId])
+  @@map("images")
+}
+
+model Pet {
+  uid              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String    @db.ObjectId
+  user             User      @relation(fields: [userId], references: [uid])
+  nombre           String
+  sexo             String?
+  tipo             String
+  edad             DateTime?
+  status           Boolean   @default(true)
+  raza             String    @default("Otro")
+  descripcion      String?
+  perdido          Boolean   @default(false)
+  img              String?
+  fechaPerdida     DateTime?
+  horaPerdida      String?
+  longitudePerdida Float?
+  lantitudePerdida Float?
+  created          DateTime  @default(now())
+  Image            Image[]
+
+  @@index([userId])
+  @@map("pets")
+}
+
+model User {
+  uid                  String                 @id @default(auto()) @map("_id") @db.ObjectId
+  nombre               String
+  sexo                 String                 @default("Otro")
+  password             String?
+  email                String                 @unique
+  latitude             Float?
+  longitude            Float?
+  edad                 DateTime?
+  role                 String                 @default("MASCOTA")
+  status               Boolean                @default(true)
+  google               Boolean                @default(false)
+  descripcion          String?
+  img                  String?
+  logoPerfil           String?
+  created              DateTime               @default(now())
+  googleUserId         String?
+  posts                Image[]
+  pets                 Pet[]
+  Alerts               Alerts[]
+  Reports              Report[]               @relation("UserReported")
+  ReportsBy            Report[]               @relation("UserReporting")
+  recoveryPassword     RecoveryPassword[]
+  userConnected        UserConnect[]
+  likes                Like[]
+  notifications        Notifications[]        @relation("UserOwner")
+  notificationsBy      Notifications[]        @relation("UserSender")
+  deleteUserReasons    DeleteUserReasons[]
+  commentsAdmin        CommentsAdmin[]
+  comments             Comments[]
+  commentsChildren     CommentsChildren[]
+  LikeComments         LikeComments[]
+  LikeCommentsChildren LikeCommentsChildren[]
+
+  @@map("users")
+}
+
+model Alerts {
+  uid         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user        String   @db.ObjectId
+  userCross   User     @relation(fields: [user], references: [uid])
+  uidImg      String   @db.ObjectId
+  uidImgCroos Image    @relation(fields: [uidImg], references: [uid])
+  alert       Int?
+  note        String
+  status      Boolean  @default(true)
+  charged     DateTime @default(now())
+
+  @@index([user, uidImg])
+  @@map("alerts")
+}
+
+model Report {
+  uid               String   @id @default(auto()) @map("_id") @db.ObjectId
+  user              String   @db.ObjectId
+  userCross         User     @relation("UserReporting", fields: [user], references: [uid])
+  userReported      String   @db.ObjectId
+  userReportedCross User     @relation("UserReported", fields: [userReported], references: [uid])
+  note              String
+  status            Boolean  @default(true)
+  charged           DateTime @default(now())
+
+  @@index([user, userReported])
+  @@map("reports")
+}
+
+model Sexo {
+  uid  String @id @default(auto()) @map("_id") @db.ObjectId
+  sexo String
+
+  @@map("sexos")
+}
+
+model Tipo {
+  uid  String @id @default(auto()) @map("_id") @db.ObjectId
+  tipo String
+
+  @@map("tipos")
+}
+
+model Role {
+  uid  String @id @default(auto()) @map("_id") @db.ObjectId
+  role String
+
+  @@map("roles")
+}
+
+model RecoveryPassword {
+  uid       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      String   @db.ObjectId
+  userCross User     @relation(fields: [user], references: [uid])
+  code      Int?
+  status    Boolean  @default(true)
+  charged   DateTime @default(now())
+
+  @@index([user, charged])
+  @@map("recoverypasswords")
+}
+
+model Raza {
+  uid  String @id @default(auto()) @map("_id") @db.ObjectId
+  raza String
+
+  @@map("razas")
+}
+
+model Pais {
+  uid  String @id @default(auto()) @map("_id") @db.ObjectId
+  pais String
+
+  @@map("pais")
+}
+
+model UserConnect {
+  uid           String   @id @default(auto()) @map("_id") @db.ObjectId
+  user          String   @db.ObjectId
+  userCross     User     @relation(fields: [user], references: [uid])
+  statusConnect Boolean  @default(true)
+  created       DateTime @default(now())
+
+  @@index([user])
+  @@map("userconnects")
+}
+
+model Like {
+  uid       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      String   @db.ObjectId
+  userCross User     @relation(fields: [user], references: [uid])
+  uidImg    String   @db.ObjectId
+  image     Image    @relation(fields: [uidImg], references: [uid])
+  like      Int?
+  status    Boolean  @default(true)
+  charged   DateTime @default(now())
+
+  @@index([user, uidImg])
+  @@map("likes")
+}
+
+model Notifications {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userOwner       String   @db.ObjectId
+  userOwnerCross  User     @relation("UserOwner", fields: [userOwner], references: [uid])
+  uidImg          String   @db.ObjectId
+  image           Image    @relation(fields: [uidImg], references: [uid])
+  userSender      String   @db.ObjectId
+  userSenderCross User     @relation("UserSender", fields: [userSender], references: [uid])
+  event           String
+  statusSeen      Boolean  @default(false)
+  status          Boolean  @default(true)
+  charged         DateTime @default(now())
+
+  @@index([userOwner, uidImg, userSender])
+  @@map("notifications")
+}
+
+model DeleteUserReasons {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      String   @db.ObjectId
+  userCross User     @relation(fields: [user], references: [uid])
+  alert     Int?
+  note      String
+  status    Boolean  @default(true)
+  charged   DateTime @default(now())
+
+  @@index([user])
+  @@map("deleteuserreasons")
+}
+
+model ActionPlan {
+  uid        String @id @default(auto()) @map("_id") @db.ObjectId
+  actionPlan String
+
+  @@map("actionplans")
+}
+
+model CommentsAdmin {
+  uid       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      String   @db.ObjectId
+  userCross User     @relation(fields: [user], references: [uid])
+  comments  String?
+  status    Boolean  @default(true)
+  charged   DateTime @default(now())
+
+  @@index([user])
+  @@map("commentsadmins")
+}
+
+model Comments {
+  uid              String             @id @default(auto()) @map("_id") @db.ObjectId
+  user             String             @db.ObjectId
+  userCross        User               @relation(fields: [user], references: [uid])
+  uidImg           String             @db.ObjectId
+  image            Image              @relation(fields: [uidImg], references: [uid])
+  comments         String?
+  status           Boolean            @default(true)
+  charged          DateTime           @default(now())
+  commentsChildren CommentsChildren[]
+  LikeComments     LikeComments[]
+
+  @@index([user, uidImg])
+  @@map("comments")
+}
+
+model CommentsChildren {
+  uid                  String                 @id @default(auto()) @map("_id") @db.ObjectId
+  user                 String                 @db.ObjectId
+  userCross            User                   @relation(fields: [user], references: [uid])
+  uidCommentsFather    String                 @db.ObjectId
+  commentsFather       Comments               @relation(fields: [uidCommentsFather], references: [uid])
+  comments             String?
+  status               Boolean                @default(true)
+  charged              DateTime               @default(now())
+  LikeCommentsChildren LikeCommentsChildren[]
+
+  @@index([user, uidCommentsFather])
+  @@map("commentschildrens")
+}
+
+model LikeComments {
+  uid         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user        String   @db.ObjectId
+  userCross   User     @relation(fields: [user], references: [uid])
+  uidComments String   @db.ObjectId
+  comments    Comments @relation(fields: [uidComments], references: [uid])
+  like        Int?
+  status      Boolean  @default(true)
+  charged     DateTime @default(now())
+
+  @@index([user, uidComments])
+  @@map("likecomments")
+}
+
+model LikeCommentsChildren {
+  uid              String           @id @default(auto()) @map("_id") @db.ObjectId
+  user             String           @db.ObjectId
+  userCross        User             @relation(fields: [user], references: [uid])
+  uidComments      String           @db.ObjectId
+  commentsChildren CommentsChildren @relation(fields: [uidComments], references: [uid])
+  like             Int?
+  status           Boolean          @default(true)
+  charged          DateTime         @default(now())
+
+  @@index([user, uidComments])
+  @@map("likecommentschildrens")
 }

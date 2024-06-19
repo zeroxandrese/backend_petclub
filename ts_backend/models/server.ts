@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 import fileUpload from 'express-fileupload';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import { dbContection } from '../database/config';
+import { dbConnection } from '../database/config';
 import { socketController } from '../controllers/socket';
 
 // Define the rate limiter

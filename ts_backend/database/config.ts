@@ -7,10 +7,10 @@ interface DbConnectionError extends Error {
 const dbConnection = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGODB_CNN!, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true, // Add for proper index creation
-      useFindAndModify: false, // Consider if needed for legacy updates
+      //useNewUrlParser: true,
+      //useUnifiedTopology: true,
+      //useCreateIndex: true, // Add for proper index creation
+      //useFindAndModify: false, // Consider if needed for legacy updates
     });
     console.log('Ya estamos online Crack');
   } catch (error: unknown) {
