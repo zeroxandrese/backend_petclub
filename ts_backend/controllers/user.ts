@@ -1,22 +1,60 @@
-const { response, query } = require('express');
-const bcryptjs = require('bcryptjs');
-const { generateJwt } = require('../helpers/generate-jwt');
+import { response, query } from 'express';
+import * as bcryptjs from 'bcryptjs';
 
-const { User } = require('../models/index');
+import { PrismaClient } from '@prisma/client';
+import { generateJwt } from '../helpers/generate-jwt';
 
+const prisma = new PrismaClient();
 
-const usersGet = async (req, res = response) => {
+const usersGet = async (req: any, res = response) => {
+
     const { page } = req.query;
-    const options = { page: page || 1, limit: 10 }
-    const query = { status: true };
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = 20;
 
-    // se utliza paginate para traer todos los usuarios controlados
-    const users = await User.paginate(query, options)
-    res.status(201).json(users);
+    try {
+
+        // Obtencion total usuarios
+        const totalDocs = await prisma.user.count({
+            where: { status: true },
+        });
+
+        // calculo total paginas
+        const totalPages = Math.ceil(totalDocs / pageSize);
+
+        const docs = await prisma.user.findMany({
+            where: { status: true },
+            skip: (pageNumber - 1) * pageSize,
+            take: pageSize,
+        });
+
+        // calculos para la paginacion
+        const pagingCounter = (pageNumber - 1) * pageSize + 1;
+        const hasPrevPage = pageNumber > 1;
+        const hasNextPage = pageNumber < totalPages;
+        const prevPage = hasPrevPage ? pageNumber - 1 : null;
+        const nextPage = hasNextPage ? pageNumber + 1 : null;
+
+        res.status(201).json({
+            docs,
+            totalDocs,
+            limit: pageSize,
+            totalPages,
+            page: pageNumber,
+            pagingCounter,
+            hasPrevPage,
+            hasNextPage,
+            prevPage,
+            nextPage,
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 };
 
-const usersPut = async (req, res = response) => {
-    const uid1 = req.params.id;
+const usersPut = async (req: any, res = response) => {
+    const uid = req.params.id;
     const { password, google, correo, ...user } = req.body;
 
     if (password) {
@@ -24,46 +62,82 @@ const usersPut = async (req, res = response) => {
         user.password = bcryptjs.hashSync(password, salt);
     }
 
-    const usuario = await User.findOneAndUpdate({_id: uid1}, user, { new: true });
+    try {
+        const usuario = await prisma.user.update({
+            where: { uid },
+            data: { ...user },
+        });
 
-    res.status(201).json(usuario);
+        res.status(201).json(usuario);
+    } catch (error) {
+        console.error('Error al actualizar usuario:', error);
+        res.status(500).json({ msg: 'Error al actualizar usuario' });
+    }
 };
 
-const usersPost = async (req, res = response) => {
-
+const usersPost = async (req: any, res = response) => {
     const { nombre, sexo, password, email, latitude, longitude, edad, role, status, google } = req.body;
 
-    const user = new User({ nombre, sexo, password, email , latitude, longitude, edad, role, status, google });
+    try {
+        // Encriptado del password
+        const salt = bcryptjs.genSaltSync();
+        const hashedPassword = bcryptjs.hashSync(password, salt);
 
-    //Encriptado del password
-    const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password, salt);
+        let formattedEdad: Date | undefined = undefined;
+        if (edad) {
+            formattedEdad = new Date(edad);
+            if (isNaN(formattedEdad.getTime())) {
+                return res.status(400).json({ msg: 'Formato de fecha inválido' });
+            }
+        }
 
-    await user.save();
+        // Crear usuario con Prisma
+        const newUser = await prisma.user.create({
+            data: {
+                nombre,
+                sexo,
+                password: hashedPassword,
+                email,
+                latitude,
+                longitude,
+                edad: formattedEdad,
+                role,
+                status,
+                google,
+            }
+        });
 
-    const userCreated = await User.findOne({ email });
+        // Generar JWT
+        const token = await generateJwt(newUser.uid);
 
-    //Generar JWT
-    const token = await generateJwt(userCreated.id);
-
-    res.status(201).json({
-        user,
-        token
-    });
+        res.status(201).json({
+            user: newUser,
+            token
+        });
+    } catch (error) {
+        console.error('Error al crear usuario:', error);
+        res.status(500).json({ msg: 'Error al crear usuario' });
+    }
 };
 
-const usersDelete = async (req, res = response) => {
+const usersDelete = async (req: any, res = response) => {
     const id = req.params.id;
-    //Borrar usuario permanentemente
-    //const usuario = await User.findByIdAndDelete( id );
 
-    //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const usuario = await User.findByIdAndUpdate(id, { status: false });
+    try {
+        // Actualizar el usuario con status: false para marcarlo como eliminado
+        const usuario = await prisma.user.update({
+            where: { uid: id },
+            data: { status: false }
+        });
 
-    res.status(201).json({ usuario });
+        res.status(201).json({ usuario });
+    } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        res.status(500).json({ msg: 'Error al eliminar usuario' });
+    }
 };
 
-module.exports = {
+export {
     usersGet,
     usersPut,
     usersPost,

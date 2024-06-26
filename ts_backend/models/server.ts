@@ -1,11 +1,34 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { type Application } from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import fileUpload from 'express-fileupload';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import { dbConnection } from '../database/config';
-import { socketController } from '../controllers/socket';
+
+import dbConnection from '../database/config';
+import socketController from '../controllers/socket';
+
+// Importa tus rutas aquí
+import authRoutes from '../routes/auth';
+import userRoutes from '../routes/user';
+import imageRoutes from '../routes/image';
+import searchRoutes from '../routes/search';
+import uploadRoutes from '../routes/uploads';
+import commentRoutes from '../routes/comments';
+import commentChildrenRoutes from '../routes/commentsChildren';
+import alertRoutes from '../routes/alerts';
+import likeRoutes from '../routes/like';
+import likeCommentsRoutes from '../routes/likeComments';
+import likeCommentsChildrenRoutes from '../routes/likeCommentsChildren';
+import commentsAdminRoutes from '../routes/commentsAdmin';
+import petRoutes from '../routes/pet';
+import reportRoutes from '../routes/report';
+import recoveryPasswordRoutes from '../routes/recoveryPassword';
+import recoveryPasswordCodeRoutes from '../routes/recoveryPasswordCode';
+import notificationRoutes from '../routes/notifications';
+import deleteUserReasonsRoutes from '../routes/deleteUserReasons';
+import elementsMapRoutes  from '../routes/elementdMap';
+import tasksRoutes  from '../routes/tasks';
 
 // Define the rate limiter
 const limiter = rateLimit({
@@ -38,6 +61,8 @@ class Server {
     private recoveryPasswordCodePath = '/api/recoveryPasswordCode';
     private notificationsPath = '/api/notifications';
     private deleteUserReasonsPath = '/api/deleteUserReasons';
+    private elementsMapPath = '/api/elementsMap';
+    private tasksPath = '/api/tasks';
 
     constructor() {
         this.app = express();
@@ -47,7 +72,7 @@ class Server {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
-                transports: ['websocket', 'polling']
+                //transports: ['websocket', 'polling']
             }
         });
 
@@ -65,10 +90,10 @@ class Server {
     }
 
     async conectarDB() {
-        await dbContection();
+        await dbConnection();
     }
 
-    middlewares() {
+    private middlewares() {
         // Cors para restringir peticiones
         this.app.use(cors());
 
@@ -92,29 +117,33 @@ class Server {
         }));
     }
 
-    routes() {
-        this.app.use(this.authPath, require('../routes/auth'));
-        this.app.use(this.routerPath, require('../routes/user'));
-        this.app.use(this.imgPath, require('../routes/image'));
-        this.app.use(this.searchPath, require('../routes/search'));
-        this.app.use(this.uploadsPath, require('../routes/uploads'));
-        this.app.use(this.commentsPath, require('../routes/comments'));
-        this.app.use(this.commentsChildrenPath, require('../routes/commentsChildren'));
-        this.app.use(this.alertsPath, require('../routes/alerts'));
-        this.app.use(this.likePath, require('../routes/like'));
-        this.app.use(this.likeCommentsPath, require('../routes/likeComments'));
-        this.app.use(this.likeCommentsChildrenPath, require('../routes/likeCommentsChildren'));
-        this.app.use(this.commentsAdminPath, require('../routes/commentsAdmin'));
-        this.app.use(this.petPath, require('../routes/pet'));
-        this.app.use(this.reportPath, require('../routes/report'));
-        this.app.use(this.recoveryPasswordPath, require('../routes/recoveryPassword'));
-        this.app.use(this.recoveryPasswordCodePath, require('../routes/recoveryPasswordCode'));
-        this.app.use(this.notificationsPath, require('../routes/notifications'));
-        this.app.use(this.deleteUserReasonsPath, require('../routes/deleteUserReasons'));
+    private routes() {
+        this.app.use(this.authPath, authRoutes);
+        this.app.use(this.routerPath, userRoutes);
+        this.app.use(this.imgPath, imageRoutes);
+        this.app.use(this.searchPath, searchRoutes);
+        this.app.use(this.uploadsPath, uploadRoutes);
+        this.app.use(this.commentsPath, commentRoutes);
+        this.app.use(this.commentsChildrenPath, commentChildrenRoutes);
+        this.app.use(this.alertsPath, alertRoutes);
+        this.app.use(this.likePath, likeRoutes);
+        this.app.use(this.likeCommentsPath, likeCommentsRoutes);
+        this.app.use(this.likeCommentsChildrenPath, likeCommentsChildrenRoutes);
+        this.app.use(this.commentsAdminPath, commentsAdminRoutes);
+        this.app.use(this.petPath, petRoutes);
+        this.app.use(this.reportPath, reportRoutes);
+        this.app.use(this.recoveryPasswordPath, recoveryPasswordRoutes);
+        this.app.use(this.recoveryPasswordCodePath, recoveryPasswordCodeRoutes);
+        this.app.use(this.notificationsPath, notificationRoutes);
+        this.app.use(this.deleteUserReasonsPath, deleteUserReasonsRoutes);
+        this.app.use(this.elementsMapPath, elementsMapRoutes);
+        this.app.use(this.tasksPath, tasksRoutes);
     }
 
-    sockets() {
-        this.io.on('connection', socketController);
+    private sockets() {
+        this.io.on('connection', (socket) => {
+            socketController(socket);
+        });
     }
 
     listen() {

@@ -1,12 +1,21 @@
-const { response } = require('express');
-const bcryptjs = require('bcryptjs');
-const { OAuth2Client } = require('google-auth-library');
-require('dotenv').config();
+import { response, request } from 'express';
+import * as bcryptjs from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
+import { PrismaClient } from '@prisma/client';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const User = require('../models/user');
-const { generateJwt } = require('../helpers/generate-jwt');
+import { generateJwt } from '../helpers/generate-jwt';
 
-const verifyToken = async (req, res = response) => {
+interface AuthenticatedRequest extends Request {
+    userAuth?: {
+        uid: string;
+    }
+}
+
+const prisma = new PrismaClient();
+
+const verifyToken = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
 
@@ -29,14 +38,16 @@ const verifyToken = async (req, res = response) => {
 };
 
 
-const login = async (req, res = response) => {
+const login = async (req: any, res = response) => {
 
     const { email, password } = req.body;
 
     try {
         // Validacion correo 
-        const user = await User.findOne({ email });
-        
+        const user = await prisma.user.findUnique({
+            where: { email: email }
+        });
+
         if (!user) {
             return res.status(400).json({
                 msg: 'El email / Password son incorrectos'
@@ -49,14 +60,20 @@ const login = async (req, res = response) => {
             });
         }
         //Validacion password
-        const findPassword = bcryptjs.compareSync(password, user.password);
+        if (!user.password) {
+            return res.status(400).json({
+                msg: 'El email / Password son incorrectos'
+            });
+        }
+
+        const findPassword = await bcryptjs.compareSync(password, user!.password);
         if (!findPassword) {
             return res.status(400).json({
                 msg: 'El email / Password son incorrectos'
             });
         }
         //Generar JWT
-        const token = await generateJwt(user.id);
+        const token = await generateJwt(user.uid);
 
         res.json({
             user,
@@ -70,7 +87,7 @@ const login = async (req, res = response) => {
     }
 };
 
-const googleLogin = async (req, res) => {
+const googleLogin = async (req: any, res = response) => {
     const { googleToken } = req.body;
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
@@ -82,27 +99,38 @@ const googleLogin = async (req, res) => {
             audience: googleClientId
         });
 
-        const payload = ticket.getPayload();
+        const payload = await ticket.getPayload();
+
+        if (!payload) {
+            return res.status(500).json({
+                msg: 'Error ponerse en contacto con el admin'
+            });
+        }
+
         const googleUserId = payload.sub;
         // Verificar si el usuario ya está registrado en tu base de datos
-        let user = await User.findOne({ email: payload.email });
+        let user = await prisma.user.findUnique({
+            where: { email: payload.email }
+        }
+        );
 
         //Creacion del usuario si la informacion no existe
         if (!user) {
             const { email, name, picture } = payload;
-            user = new User({
-                email: email,
-                nombre: name,
-                img: picture,
-                google: true,
-                googleUserId,
-            });
-            await user.save();
+            prisma.user.create({
+                data: {
+                    email: email || 'default@example.com',
+                    nombre: name || 'Default Name',
+                    img: picture,
+                    google: true,
+                    googleUserId,
+                }
+            })
         };
 
-        const userId = user._id;
+        const userId = user?.uid;
         //Generar JWT
-        const token = await generateJwt(userId.toString());
+        const token = await generateJwt(userId?.toString());
 
         res.json({
             user,
@@ -114,7 +142,7 @@ const googleLogin = async (req, res) => {
     }
 };
 
-module.exports = {
+export {
     login,
     googleLogin,
     verifyToken

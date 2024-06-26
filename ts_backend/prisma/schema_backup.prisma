@@ -15,10 +15,10 @@ datasource db {
 
 model Image {
   uid                     String          @id @default(auto()) @map("_id") @db.ObjectId
-  user                    String          @db.ObjectId
-  userCross               User            @relation(fields: [user], references: [uid])
-  pet                     String?         @db.ObjectId
-  petCross                Pet?            @relation(fields: [pet], references: [uid])
+  userId                  String          @db.ObjectId
+  user                    User            @relation(fields: [userId], references: [uid])
+  petId                   String?         @db.ObjectId
+  pet                     Pet?            @relation(fields: [petId], references: [uid])
   img                     String?
   status                  Boolean         @default(true)
   descripcion             String?
@@ -36,14 +36,14 @@ model Image {
   Notifications           Notifications[]
   Comments                Comments[]
 
-  @@index([user, pet])
+  @@index([userId])
   @@map("images")
 }
 
 model Pet {
   uid              String    @id @default(auto()) @map("_id") @db.ObjectId
-  user             String    @db.ObjectId
-  userCross        User      @relation(fields: [user], references: [uid])
+  userId           String    @db.ObjectId
+  user             User      @relation(fields: [userId], references: [uid])
   nombre           String
   sexo             String?
   tipo             String
@@ -60,7 +60,7 @@ model Pet {
   created          DateTime  @default(now())
   Image            Image[]
 
-  @@index([user])
+  @@index([userId])
   @@map("pets")
 }
 
@@ -97,15 +97,6 @@ model User {
   commentsChildren     CommentsChildren[]
   LikeComments         LikeComments[]
   LikeCommentsChildren LikeCommentsChildren[]
-  PawsCount            PawsCount[]
-  TokenPoint           TokenPoint[]
-  CountLikes           CountLikes[]           @relation("user")
-  CountLikesBy         CountLikes[]           @relation("UserSender")
-  CountComments        CountComments[]
-  CountVideos          CountVideos[]
-  CountImage           CountImage[]
-  TasksByUser          TasksByUser[]
-  Ranking              Ranking[]
 
   @@map("users")
 }
@@ -212,7 +203,7 @@ model Like {
 }
 
 model Notifications {
-  uid             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
   userOwner       String   @db.ObjectId
   userOwnerCross  User     @relation("UserOwner", fields: [userOwner], references: [uid])
   uidImg          String   @db.ObjectId
@@ -229,7 +220,7 @@ model Notifications {
 }
 
 model DeleteUserReasons {
-  uid       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      String   @db.ObjectId
   userCross User     @relation(fields: [user], references: [uid])
   alert     Int?
@@ -317,169 +308,4 @@ model LikeCommentsChildren {
 
   @@index([user, uidComments])
   @@map("likecommentschildrens")
-}
-
-model PawsCount {
-  uid        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user       String   @db.ObjectId
-  userCross  User     @relation(fields: [user], references: [uid])
-  paws       Int?     @default(0)
-  status     Boolean  @default(true)
-  lastUpdate DateTime
-
-  @@index([user])
-  @@map("pawscounts")
-}
-
-model TokenPoint {
-  uid            String   @id @default(auto()) @map("_id") @db.ObjectId
-  user           String   @db.ObjectId
-  userCross      User     @relation(fields: [user], references: [uid])
-  points         Int?     @default(0)
-  deliveryNumber Int?     @default(0)
-  status         Boolean  @default(true)
-  lastUpdate     DateTime
-
-  @@index([user])
-  @@map("tokenpoints")
-}
-
-model ElementMapRefugios {
-  uid                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  //uidProfileRefugios   String         @db.ObjectId
-  //ProfileRefugiosCross ProfileRefugios @relation(fields: [uidProfileRefugios], references: [uid])
-  nombre               String?
-  latitude             Float?
-  longitude            Float?
-  role                 String   @default("REFUGIOS")
-  status               Boolean  @default(true)
-  descripcion          String?
-  img                  String?
-  weekOpening          String?
-  weekClosing          String?
-  dateAttentionWeek    String?
-  weekendOpening       String?
-  weekendClosing       String?
-  dateAttentionWeekend String?
-  phone                Int?
-  email                String?
-  created              DateTime @default(now())
-
-  //@@index([uidProfileRefugios])
-  @@map("elementmaprefugios")
-}
-
-model ProfileRefugios {
-  uid                String   @id @default(auto()) @map("_id") @db.ObjectId
-  nombre             String
-  password           String?
-  category           String?
-  email              String   @unique
-  latitude           Float?
-  longitude          Float?
-  role               String   @default("REFUGIOS")
-  status             Boolean  @default(true)
-  google             Boolean  @default(false)
-  descripcion        String?
-  img                String?
-  attention          String?
-  logoPerfil         String?
-  created            DateTime @default(now())
-  googleUserId       String?
-  representanteLegal String?
-  documento1         String?
-  documento2         String?
-  codeVerify         Boolean  @default(false)
-
-  //elementMapRefugios ElementMapRefugios[]
-
-  @@map("profilerefugios")
-}
-
-model CountLikes {
-  uid             String   @id @default(auto()) @map("_id") @db.ObjectId
-  user            String   @db.ObjectId
-  userCross       User     @relation("user", fields: [user], references: [uid])
-  userSender      String   @db.ObjectId
-  userSenderCross User     @relation("UserSender", fields: [userSender], references: [uid])
-  like            Int?     @default(0)
-  status          Boolean  @default(true)
-  created         DateTime @default(now())
-
-  @@index([user, userSender])
-  @@map("countlikes")
-}
-
-model CountVideos {
-  uid        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user       String   @db.ObjectId
-  userCross  User     @relation(fields: [user], references: [uid])
-  videos     Int?     @default(0)
-  status     Boolean  @default(true)
-  lastUpdate DateTime
-
-  @@index([user])
-  @@map("countvideos")
-}
-
-model CountImage {
-  uid        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user       String   @db.ObjectId
-  userCross  User     @relation(fields: [user], references: [uid])
-  images     Int?     @default(0)
-  status     Boolean  @default(true)
-  lastUpdate DateTime
-
-  @@index([user])
-  @@map("countimage")
-}
-
-model CountComments {
-  uid        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user       String   @db.ObjectId
-  userCross  User     @relation(fields: [user], references: [uid])
-  comments   Int?     @default(0)
-  status     Boolean  @default(true)
-  lastUpdate DateTime
-
-  @@index([user])
-  @@map("countcomments")
-}
-
-model Tasks {
-  uid         String        @id @default(auto()) @map("_id") @db.ObjectId
-  subject     String
-  description String
-  reward      Float         @default(0)
-  status      Boolean       @default(true)
-  created     DateTime      @default(now())
-  TasksByUser TasksByUser[]
-
-  @@map("tasks")
-}
-
-model TasksByUser {
-  uid        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user       String   @db.ObjectId
-  userCross  User     @relation(fields: [user], references: [uid])
-  uidTask    String   @db.ObjectId
-  taskCross  Tasks    @relation(fields: [uidTask], references: [uid])
-  porc       Int      @default(0)
-  status     Boolean  @default(true)
-  created    DateTime @default(now())
-  lastUpdate DateTime
-
-  @@index([user, uidTask])
-  @@map("tasksByUser")
-}
-
-model Ranking {
-  uid       String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      String   @db.ObjectId
-  userCross User     @relation(fields: [user], references: [uid])
-  position  Int      @default(0)
-  status    Boolean  @default(true)
-  created   DateTime @default(now())
-
-  @@map("ranking")
 }

@@ -1,21 +1,19 @@
 import { Router } from 'express';
 
 import validarCampos from '../middelwares/validar-campos';
-import {
-    deleteUserReasonsPost,
-    deleteUserReasonsDelete
-} from '../controllers/deleteUserReasons';
+import { searchImagesLostGet, searchRefugiosGet } from '../controllers/controllerElementsMap';
 import validarJWT from '../middelwares/validar-jwt';
 
 const router = Router();
 
-router.post('/', [
+router.post('/petLost', [
     validarJWT,
     validarCampos
-], deleteUserReasonsPost);
+], searchImagesLostGet);
 
-router.delete('/', [
-    validarJWT
-], deleteUserReasonsDelete);
+router.post('/refugios', [
+    validarJWT,
+    validarCampos
+], searchRefugiosGet);
 
 export default router;

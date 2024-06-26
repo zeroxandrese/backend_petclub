@@ -1,11 +1,11 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { notificationsPut } = require('../controllers/notifications');
-const { findIdNotifications } = require('../helpers/db-validators');
-const { idValidatorNotifications } = require('../helpers/id-validator-notifications');
-const { validarJWT } = require('../middelwares/validar-jwt');
+import validarCampos from '../middelwares/validar-campos';
+import notificationsPut from '../controllers/notifications';
+import { findIdNotifications } from '../helpers/db-validators';
+import idValidatorNotifications from '../helpers/id-validator-notifications';
+import validarJWT from '../middelwares/validar-jwt';
 
 const router = Router();
 
@@ -19,4 +19,4 @@ router.put('/:id', [
 
 
 
-module.exports = router;
+export default router;

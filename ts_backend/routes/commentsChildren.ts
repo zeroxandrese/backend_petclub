@@ -1,14 +1,14 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { commentsChildrenGet,
+import validarCampos from '../middelwares/validar-campos';
+import { commentsChildrenGet,
     commentsChildrenPut,
     commentsChildrenPost,
-    commentsChildrenDelete } = require('../controllers/commentsChildren');
-const { findIdCom, findIdComChil } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorComChil, idValidatorComChilOwner } = require('../helpers/id-validator-commentsChildren');
+    commentsChildrenDelete } from '../controllers/commentsChildren';
+import { findIdCom, findIdComChil } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import { idValidatorComChil, idValidatorComChilOwner } from '../helpers/id-validator-commentsChildren';
 
 const router = Router();
 
@@ -42,4 +42,4 @@ router.delete('/:id', [
     validarCampos
 ], commentsChildrenDelete);
 
-module.exports = router;
+export default router;

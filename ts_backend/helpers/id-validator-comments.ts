@@ -1,9 +1,10 @@
-const { response } = require("express");
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { Comments, Image } = require('../models/index');
+const prisma = new PrismaClient();
 
-
-const idValidatorCom = async (req, res = response, next) => {
+const idValidatorCom = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     if(id === 'undefined' || id === undefined || ''){
@@ -11,7 +12,7 @@ const idValidatorCom = async (req, res = response, next) => {
             msg: 'ID no valido'
         })
     }
-    const validacionIdCom = await Comments.findById(id);
+    const validacionIdCom = await prisma.comments.findUnique({ where: { uid: id } });
 
     if(validacionIdCom === null){
         return res.status(400).json({
@@ -19,7 +20,7 @@ const idValidatorCom = async (req, res = response, next) => {
         })
     }
 
-    const uid1 = JSON.stringify(uid._id);
+    const uid1 = JSON.stringify(uid?.uid);
     const uidUpdate = uid1.slice(1, -1);
 
     const uid2 = JSON.stringify(validacionIdCom.user);
@@ -51,7 +52,7 @@ const idValidatorCom = async (req, res = response, next) => {
 
 }
 
-const idValidatorComOwner = async (req, res = response, next) => {
+const idValidatorComOwner = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
 
@@ -66,7 +67,7 @@ const idValidatorComOwner = async (req, res = response, next) => {
                 msg: 'ID no valido'
             })
         }
-        const validacionIdCom = await Comments.findById(id);
+        const validacionIdCom = await prisma.comments.findUnique({ where: { uid: id } });
     
         if(validacionIdCom === null){
             return res.status(400).json({
@@ -75,11 +76,11 @@ const idValidatorComOwner = async (req, res = response, next) => {
         }
         
         const validacionIdCom2 = validacionIdCom.uidImg;
-        const validacionIdCom3 = await Image.findById(validacionIdCom2);
-        const uid1 = JSON.stringify(uid._id);
+        const validacionIdCom3 = await prisma.image.findUnique({ where: { uid: validacionIdCom2 } });
+        const uid1 = JSON.stringify(uid?.uid);
         const uidUpdate = uid1.slice(1, -1);
 
-        const uid2 = JSON.stringify(validacionIdCom3.user);
+        const uid2 = JSON.stringify(validacionIdCom3?.user);
         const uidUpdate2 = uid2.slice(1, -1);
 
         const uid3 = JSON.stringify(validacionIdCom.user);
@@ -100,7 +101,7 @@ const idValidatorComOwner = async (req, res = response, next) => {
     }
 }
 
-module.exports = {
+export {
     idValidatorCom,
     idValidatorComOwner
 }

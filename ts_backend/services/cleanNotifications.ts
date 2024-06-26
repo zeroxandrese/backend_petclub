@@ -1,27 +1,34 @@
-const cron = require('node-cron');
-const { Notifications } = require('../models/index');
-const { dbContection } = require('../database/config');
+import { CronJob } from 'cron';
+import dbConnection from '../database/config';
+import { PrismaClient } from '@prisma/client';
 
-require('dotenv').config();
+const prisma = new PrismaClient();
 
-// definicion de job una vez al dia a media noche
-cron.schedule('0 0 * * *', async () => {
-
+// Definición del job para ejecutar una vez al día a medianoche
+const job = new CronJob('0 0 * * *', async () => {
   try {
-    await dbContection();
+    await dbConnection();
 
-    const uniqueUsers = await Notifications.distinct('userOwner');
+    // Obtener usuarios únicos que tienen notificaciones
+    const uniqueUsers = await prisma.notifications.findMany({
+      distinct: ['userOwner'],
+      select: { userOwner: true },
+    });
 
-    for (const user of uniqueUsers) {
-      const userNotifications = await Notifications.find({ userOwner: user }).sort({ charged: -1 });
+    for (const { userOwner } of uniqueUsers) {
+      // Obtener notificaciones del usuario, ordenadas por fecha de carga
+      const userNotifications = await prisma.notifications.findMany({
+        where: { userOwner },
+        orderBy: { charged: 'desc' },
+      });
 
       // Elimina los registros que excedan el límite de 15 por usuario
       if (userNotifications.length > 15) {
         const notificationsToDelete = userNotifications.slice(15);
         for (const notification of notificationsToDelete) {
-          if (notification.userOwner.toString() === user.toString()) {
-            await Notifications.findByIdAndDelete(notification._id);
-          }
+          await prisma.notifications.delete({
+            where: { uid: notification.uid },
+          });
         }
       }
     }
@@ -30,3 +37,5 @@ cron.schedule('0 0 * * *', async () => {
     console.error('Error al ejecutar la tarea de limpieza de notificaciones:', error);
   }
 });
+
+export default job;

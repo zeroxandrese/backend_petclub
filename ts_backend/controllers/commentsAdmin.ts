@@ -1,8 +1,15 @@
-const { response, query } = require('express');
+import { response, query } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { CommentsAdmin } = require('../models/index');
+interface AuthenticatedRequest extends Request {
+    userAuth?: {
+        _id: string;
+    }
+}
 
-const commentsAdminPost = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const commentsAdminPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { comments } = req.body;
@@ -11,20 +18,17 @@ const commentsAdminPost = async (req, res = response) => {
             msg: 'Necesita cargar un comentario'
         })
     }
-    const data = {
-        user: uid._id,
-        comments
-    }
 
-    const commentadmin = new CommentsAdmin(data);
-
-    await commentadmin.save();
+    await prisma.commentsAdmin.create({
+        data: {
+            user: uid.uid,
+            comments
+        }
+    });
 
     res.status(201).json({
-        msg:'El comentario fue cargado de manera exitosa'
+        msg: 'El comentario fue cargado de manera exitosa'
     })
 };
 
-module.exports = {
-    commentsAdminPost
-}
+export default commentsAdminPost;

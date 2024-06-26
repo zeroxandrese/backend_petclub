@@ -1,13 +1,13 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { likeCommentsPost,
+import validarCampos from '../middelwares/validar-campos';
+import { likeCommentsPost,
     likeCommentsGet,
-    likeCommentsDelete } = require('../controllers/likeComments');
-const { findIdCom, findIdLikeComments } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorLikeComments } = require('../helpers/id-validator-likeComments');
+    likeCommentsDelete } from '../controllers/likeComments';
+import { findIdCom, findIdLikeComments } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import idValidatorLikeComments from '../helpers/id-validator-likeComments';
 
 const router = Router();
 
@@ -33,4 +33,4 @@ router.post('/:id', [
     validarCampos
 ], likeCommentsDelete); */
 
-module.exports = router;
+export default router;

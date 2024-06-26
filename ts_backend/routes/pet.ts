@@ -1,12 +1,12 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { petsGet, petsPut, petsPost, petsDelete, petsGetAllOfUser, petsGetOneOfUser } = require('../controllers/pet');
-const { isTipo, isSexo, isRaza, findIdPets, findId } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorPet } = require('../helpers/id-validator-pet');
-const { verifyUploadFile } = require('../middelwares/validar-archivo');
+import validarCampos from '../middelwares/validar-campos';
+import { petsGet, petsPut, petsPost, petsDelete, petsGetAllOfUser, petsGetOneOfUser } from '../controllers/pet';
+import { isTipo, isSexo, isRaza, findIdPets, findId } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import idValidatorPet from '../helpers/id-validator-pet';
+import verifyUploadFile from '../middelwares/validar-archivo';
 
 const router = Router();
 
@@ -55,4 +55,4 @@ router.delete('/:id', [
 ], petsDelete);
 
 
-module.exports = router;
+export default router;

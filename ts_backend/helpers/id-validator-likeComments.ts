@@ -1,8 +1,10 @@
-const { response } = require("express");
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { LikeComments } = require('../models/index');
+const prisma = new PrismaClient();
 
-const idValidatorLikeComments = async (req, res = response, next) => {
+const idValidatorLikeComments = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     if(id === 'undefined' || id === undefined || ''){
@@ -10,7 +12,7 @@ const idValidatorLikeComments = async (req, res = response, next) => {
             msg: 'ID no valido'
         })
     }
-    const validacionIdLikeComments = await LikeComments.findById(id);
+    const validacionIdLikeComments = await prisma.likeComments.findUnique({ where: { uid: id } });
 
     if(validacionIdLikeComments === null){
         return res.status(400).json({
@@ -18,7 +20,7 @@ const idValidatorLikeComments = async (req, res = response, next) => {
         })
     }
 
-    const uid1 = JSON.stringify(uid._id);
+    const uid1 = JSON.stringify(uid?.uid);
     const uidUpdate = uid1.slice(1, -1);
     const uid2 = JSON.stringify(validacionIdLikeComments.user);
     const uidUpdate2 = uid2.slice(1, -1);
@@ -48,6 +50,4 @@ const idValidatorLikeComments = async (req, res = response, next) => {
 
 }
 
-module.exports = {
-    idValidatorLikeComments
-}
+export default idValidatorLikeComments;

@@ -1,63 +1,125 @@
-const { response } = require('express');
+import { response, query } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { CommentsChildren } = require('../models/index');
+interface AuthenticatedRequest extends Request {
+    userAuth?: {
+        _id: string;
+    }
+}
 
-const commentsChildrenGet = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+
+const commentsChildrenGet = async (req: any, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
-    const options = { page: page || 1, limit: 500 };
-    const query = { uidCommentsFather :id, status: true };
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = 500;
 
-    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de comentarios
-    const commentsChildren = await CommentsChildren.paginate(query, options)
-        res.status(201).json(commentsChildren);
+    try {
+        // Obtencion total imagenes
+        const totalDocs = await prisma.commentsChildren.count({
+            where: {
+                status: true,
+                uidCommentsFather: id
+            },
+        });
+
+        // calculo total paginas
+        const totalPages = Math.ceil(totalDocs / pageSize);
+
+        const docs = await prisma.commentsChildren.findMany({
+            where: {
+                status: true,
+                uidCommentsFather: id
+            },
+            skip: (pageNumber - 1) * pageSize,
+            take: pageSize,
+        });
+
+        // calculos para la paginacion
+        const pagingCounter = (pageNumber - 1) * pageSize + 1;
+        const hasPrevPage = pageNumber > 1;
+        const hasNextPage = pageNumber < totalPages;
+        const prevPage = hasPrevPage ? pageNumber - 1 : null;
+        const nextPage = hasNextPage ? pageNumber + 1 : null;
+
+
+
+        res.status(201).json({
+            docs,
+            totalDocs,
+            limit: pageSize,
+            totalPages,
+            page: pageNumber,
+            pagingCounter,
+            hasPrevPage,
+            hasNextPage,
+            prevPage,
+            nextPage,
+        });
+
+    } catch (error) {
+        console.error('Error fetching CommentsChildren:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
-const commentsChildrenPut = async (req, res = response) => {
+const commentsChildrenPut = async (req: any, res = response) => {
 
     const id = req.params.id;
-    const { status, ...commentsChildren } = req.body;
+    const { comments } = req.body;
+    try {
+        const comment = await prisma.commentsChildren.update({
+            where: { uid: id },
+            data: { comments }
+        });
 
-    const comment = await CommentsChildren.findByIdAndUpdate(id, commentsChildren);
-
-    res.status(201).json(comment);
+        res.status(201).json(comment);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 };
 
-const commentsChildrenPost = async (req, res = response) => {
+const commentsChildrenPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { comments } = req.body;
     const id = req.params.id;
-    if (!comments) {
-        return res.status(401).json({
-            msg: 'Necesita cargar un comentario'
-        })
+    try {
+
+        if (!comments) {
+            return res.status(401).json({
+                msg: 'Necesita cargar un comentario'
+            })
+        }
+
+        const commentChildren = await prisma.commentsChildren.create({
+            data: {
+                user: uid.uid,
+                uidCommentsFather: id,
+                comments
+            }
+        });
+
+        res.status(201).json(commentChildren);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-    const data = {
-        user: uid._id,
-        uidCommentsFather: id,
-        comments
-    }
-
-    const commentChildren = new CommentsChildren(data);
-
-    await commentChildren.save();
-
-    res.status(201).json(commentChildren);
 };
 
-const commentsChildrenDelete = async (req, res = response) => {
+const commentsChildrenDelete = async (req: any, res = response) => {
     const id = req.params.id;
     //Borrar comentario permanentemente
     //const comments = await Comments.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const commentChildren = await CommentsChildren.findByIdAndUpdate(id, { status: false });
+    const commentChildren = await prisma.commentsChildren.update({ where: { uid: id }, data: { status: false } });
 
     res.status(201).json({ commentChildren });
 };
 
-module.exports = {
+export {
     commentsChildrenGet,
     commentsChildrenPut,
     commentsChildrenPost,

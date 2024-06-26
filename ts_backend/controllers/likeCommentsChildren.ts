@@ -1,54 +1,99 @@
-const { response, query } = require('express');
+import { response, query } from 'express';
 
-const { LikeCommentsChildren } = require('../models/index');
+import { PrismaClient } from '@prisma/client';
 
-const likeCommentsChildrenGet = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const likeCommentsChildrenGet = async (req: any, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
-    const options = { page: page || 1, limit: 10 };
-    const query = { uidComments: id, status: true };
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = 200;
 
-    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
-    const likeCommentChildren = await LikeCommentsChildren.paginate(query, options)
-        res.status(201).json(likeCommentChildren);
-};
+        try {
 
-const likeCommentsChildrenPost = async (req, res = response) => {
+            // Obtencion total imagenes
+            const totalDocs = await prisma.likeCommentsChildren.count({
+                where: {
+                    status: true, 
+                    uidComments: id
+                },
+            });
 
-    const uid = await req.userAuth;
-    const { like } = req.body;
-    const id = req.params.id;
-    if (!like) {
-        return res.status(401).json({
-            msg: 'Necesita enviar una interaccion'
+            // calculo total paginas
+            const totalPages = Math.ceil(totalDocs / pageSize);
+
+            const docs = await prisma.likeCommentsChildren.findMany({
+                where: {
+                    status: true,
+                    uidComments: id
+                },
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            });
+
+            // calculos para la paginacion
+            const pagingCounter = (pageNumber - 1) * pageSize + 1;
+            const hasPrevPage = pageNumber > 1;
+            const hasNextPage = pageNumber < totalPages;
+            const prevPage = hasPrevPage ? pageNumber - 1 : null;
+            const nextPage = hasNextPage ? pageNumber + 1 : null;
+
+
+            res.status(201).json({
+                docs,
+                totalDocs,
+                limit: pageSize,
+                totalPages,
+                page: pageNumber,
+                pagingCounter,
+                hasPrevPage,
+                hasNextPage,
+                prevPage,
+                nextPage,
+            });
+
+        } catch (error) {
+            console.error('Error fetching likeCommentChildren:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+
+    };
+
+    const likeCommentsChildrenPost = async (req: any, res = response) => {
+
+        const uid = await req.userAuth;
+        const { like } = req.body;
+        const id = req.params.id;
+        if (!like) {
+            return res.status(401).json({
+                msg: 'Necesita enviar una interaccion'
+            })
+        }
+
+        const likesCommentsChildren = await prisma.likeCommentsChildren.create({
+            data: {
+                user: uid.uid,
+                uidComments: id,
+                like
+            }
         })
+
+        res.status(201).json(likesCommentsChildren);
+    };
+
+    const likeCommentsChildrenDelete = async (req: any, res = response) => {
+        const id = req.params.id;
+        //Borrar comentario permanentemente
+
+        //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
+        const likesCommentsChildren = await prisma.likeCommentsChildren.update({ where: { uid: id }, data: { status: false } });
+
+        res.status(201).json({ likesCommentsChildren });
+    };
+
+    export {
+        likeCommentsChildrenGet,
+        likeCommentsChildrenPost,
+        likeCommentsChildrenDelete
     }
-    const data = {
-        user: uid._id,
-        uidComments: id,
-        like
-    }
-
-    const likesCommentsChildren = new LikeCommentsChildren(data);
-
-    await likesCommentsChildren.save();
-
-    res.status(201).json(likesCommentsChildren);
-};
-
-const likeCommentsChildrenDelete = async (req, res = response) => {
-    const id = req.params.id;
-    //Borrar comentario permanentemente
-    //const comments = await Comments.findByIdAndDelete( id );
-
-    //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const likesCommentsChildren = await LikeCommentsChildren.findByIdAndUpdate(id, { status: false });
-
-    res.status(201).json({ likesCommentsChildren });
-};
-
-module.exports = {
-    likeCommentsChildrenGet,
-    likeCommentsChildrenPost,
-    likeCommentsChildrenDelete
-}

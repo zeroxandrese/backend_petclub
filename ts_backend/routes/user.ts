@@ -1,11 +1,11 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { usersGet, usersPut, usersPost, usersDelete } = require('../controllers/user');
-const { isRole, isSexo, findEmail, findId } = require('../helpers/db-validators');
-const { idValidator } = require('../helpers/id-validator');
-const { validarJWT } = require('../middelwares/validar-jwt');
+import validarCampos from '../middelwares/validar-campos';
+import { usersGet, usersPut, usersPost, usersDelete } from '../controllers/user';
+import { isRole, isSexo, findEmail, findId } from '../helpers/db-validators';
+import idValidator from '../helpers/id-validator';
+import validarJWT from '../middelwares/validar-jwt';
 
 const router = Router();
 
@@ -41,4 +41,4 @@ router.delete('/:id', [
 ], usersDelete);
 
 
-module.exports = router;
+export default router;

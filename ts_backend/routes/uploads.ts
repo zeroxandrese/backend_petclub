@@ -1,17 +1,17 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { cloudinaryUploadFile, getUpload } = require('../controllers/uploads');
-const { collectionAllowed } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { validarCampos } = require('../middelwares/validar-campos');
-const { verifyUploadFile } = require('../middelwares/validar-archivo')
+import { cloudinaryUploadFile, getUpload } from '../controllers/uploads';
+import { collectionAllowed } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import validarCampos from '../middelwares/validar-campos';
+import verifyUploadFile from '../middelwares/validar-archivo';
 const router = Router();
 
 router.get('/:collection/:id',[
     validarJWT,
     check('id','El id no es valido').isMongoId(),
-    check('collection').custom( c=> collectionAllowed(c, ['users','images','pets'])),
+    check('collection').custom(c => collectionAllowed(c)),
     validarCampos
 ], getUpload);
 
@@ -20,8 +20,8 @@ router.put('/:collection/:id',[
     validarJWT,
     verifyUploadFile,
     check('id','El id no es valido').isMongoId(),
-    check('collection').custom( c=> collectionAllowed(c, ['users','images','pets'])),
+    check('collection').custom(c => collectionAllowed(c)),
     validarCampos
 ], cloudinaryUploadFile);
 
-module.exports = router;
+export default router;

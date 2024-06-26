@@ -1,8 +1,10 @@
-const { response, query } = require('express');
+import { response, query, request } from 'express';
 
-const { Notifications } = require('../models/index');
+import { PrismaClient } from '@prisma/client';
 
-const notificationsPut = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const notificationsPut = async (req: any, res = response) => {
 
     const id = req.params.id;
     if (!id) {
@@ -10,11 +12,10 @@ const notificationsPut = async (req, res = response) => {
             msg: 'Datos incompletos'
         });
     }
-    const notification = await Notifications.findByIdAndUpdate(id, { statusSeen: true });
+    const notification = await prisma.notifications.update({ where: { uid: id }, data: { statusSeen: true } });
 
     res.status(201).json(notification);
 };
 
-module.exports = {
-    notificationsPut
-}
+
+export default notificationsPut;

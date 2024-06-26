@@ -1,9 +1,9 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
 
-const { recoveryPasswordPost } = require('../controllers/recoveryPassword');
-const { validarCampos } = require('../middelwares/validar-campos');
+import { recoveryPasswordPost } from '../controllers/recoveryPassword';
+import validarCampos from '../middelwares/validar-campos';
 
 const router = Router();
 
@@ -12,4 +12,4 @@ router.post('/:email', [
     validarCampos
 ], recoveryPasswordPost);
 
-module.exports = router;
+export default router;

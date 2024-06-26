@@ -1,41 +1,47 @@
-import { Socket } from 'socket.io';
 import { verifyToken } from '../helpers/generate-jwt';
 
-import { UserConnect, Image, Notifications } from '../models/index';
+import { PrismaClient } from '@prisma/client';
 
-const socketController = async (socket = new Socket()) => {
+const prisma = new PrismaClient();
+
+const socketController = async (socket: any) => {
 
   const usuario = await verifyToken(socket.handshake.headers['z-token']);
   if (!usuario) {
     return socket.disconnect();
   }
 
-  const userValidationConnected = await UserConnect.findOne(usuario._id);
+  const userValidationConnected = await prisma.userConnect.findFirst({
+    where: { uid: usuario._id }
+  });
+
   if (userValidationConnected) {
-    await UserConnect.findByIdAndDelete(userValidationConnected._id);
+    await prisma.userConnect.delete({
+      where: { uid: userValidationConnected.uid }
+    })
   }
 
-  const data = {
-    user: usuario._id
-  }
+  await prisma.userConnect.create({ data: { user: usuario._id } });
 
-  const userConnect = new UserConnect(data);
-  await userConnect.save();
   socket.join(usuario._id.toString());
 
-  socket.on('notifications-comments', async ({ imgUid }) => {
+  socket.on('notifications-comments', async ({ imgUid }: any) => {
     if (imgUid) {
       try {
-        const userValidation = await Image.findById(imgUid);
-        if (userValidation.user !== usuario._id) {
-          const data = {
-            userOwner: usuario._id,
-            uidImg: userValidation._id,
-            userSender: userValidation.user,
-            event: "COMMENTS"
-          };
-          const notifications = new Notifications(data);
-          await notifications.save();
+        const userValidation = await prisma.image.findFirst({
+          where: { uid: imgUid }
+        });
+
+        if (userValidation!.user !== usuario.uid) {
+
+          await prisma.notifications.create({
+            data: {
+              userOwner: usuario._id,
+              uidImg: userValidation!.uid,
+              userSender: userValidation!.user,
+              event: "COMMENTS"
+            }
+          });
 
           if (userValidation) {
             socket.to(userValidation.user.toString()).emit('notificationComments', { de: usuario.nombre, userValidation });
@@ -48,19 +54,23 @@ const socketController = async (socket = new Socket()) => {
     }
   });
 
-  socket.on('notifications-likes', async ({ imgUid }) => {
+  socket.on('notifications-likes', async ({ imgUid }: any) => {
     if (imgUid) {
       try {
-        const userValidation = await Image.findById(imgUid);
-        if (userValidation.user !== usuario._id) {
-          const data = {
-            userOwner: usuario._id,
-            uidImg: userValidation._id,
-            userSender: userValidation.user,
-            event: "LIKES"
-          };
-          const notifications = new Notifications(data);
-          await notifications.save();
+        const userValidation = await prisma.image.findFirst({
+          where: { uid: imgUid }
+        });
+
+        if (userValidation!.user !== usuario._id) {
+
+          await prisma.notifications.create({
+            data: {
+              userOwner: usuario._id,
+              uidImg: userValidation!.uid,
+              userSender: userValidation!.user,
+              event: "LIKES"
+            }
+          });
 
           if (userValidation) {
             socket.to(userValidation.user.toString()).emit('notificationLikes', { de: usuario.nombre, userValidation });
@@ -76,10 +86,15 @@ const socketController = async (socket = new Socket()) => {
     console.log(`Se desconectó ${usuario.nombre} con el socket ID: ${socket.id}`);
     if (usuario._id) {
       try {
-        const userConnect = await UserConnect.findOne(usuario._id);
+        const userConnect = await prisma.userConnect.findFirst({
+          where: { uid: usuario._id }
+        });
+
         if (userConnect) {
-          const { _id } = userConnect;
-          await UserConnect.findByIdAndDelete(_id);
+          const { uid } = userConnect;
+          await prisma.userConnect.delete({
+            where: { uid: uid }
+          })
         }
       } catch (error) {
         console.error('Error al desconectar el socket:', error);
@@ -89,7 +104,5 @@ const socketController = async (socket = new Socket()) => {
 
 };
 
-module.exports = {
-  socketController
-};
+export default socketController;
 

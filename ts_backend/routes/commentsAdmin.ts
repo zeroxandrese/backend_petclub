@@ -1,9 +1,10 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { commentsAdminPost } = require('../controllers/commentsAdmin');
-const { validarJWT } = require('../middelwares/validar-jwt');
+import validarCampos from '../middelwares/validar-campos';
+import commentsAdminPost from '../controllers/commentsAdmin';
+import validarJWT from '../middelwares/validar-jwt';
+
 
 const router = Router();
 
@@ -12,4 +13,4 @@ router.post('/', [
     validarCampos
 ], commentsAdminPost);
 
-module.exports = router;
+export default router;

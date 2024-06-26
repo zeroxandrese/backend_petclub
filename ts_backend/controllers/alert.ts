@@ -1,45 +1,63 @@
-const { response } = require('express');
+import { response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { Alerts } = require('../models/index');
+interface AuthenticatedRequest extends Request {
+    userAuth?: {
+        _id: string;
+    }
+}
 
-const alertsPost = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const alertsPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { alert, note } = req.body;
     const id = req.params.id;
-    if (!note) {
-        return res.status(401).json({
-            msg: 'Necesita enviar una interacción'
-        })
+    try {
+
+        if (!note) {
+            return res.status(401).json({
+                msg: 'Necesita enviar una interacción'
+            })
+        }
+
+        await prisma.alerts.create({
+            data: {
+                user: uid._id,
+                uidImg: id,
+                alert,
+                note
+            }
+        });
+
+        res.status(201).json({
+            msg: 'Alerta enviada de manera satisfactoria'
+        });
+    } catch (error) {
+        res.status(500).json({
+            msg: 'Hubo un error al procesar la solicitud'
+        });
     }
-    const data = {
-        user: uid._id,
-        uidImg: id,
-        alert,
-        note
-    }
-
-    const alerts = new Alerts(data);
-
-    await alerts.save();
-
-    res.status(201).json({
-        msg: 'Alerta enviada de manera satisfactoria'
-    });
 };
 
-const alertsDelete = async (req, res = response) => {
+const alertsDelete = async (req: any, res = response) => {
     const id = req.params.id;
-    //Borrar comentario permanentemente
-    //const comments = await Comments.findByIdAndDelete( id );
 
-    //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const alert = await Alerts.findByIdAndUpdate(id, { status: false });
+    try {
+        //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
+        const alert = await prisma.alerts.update({ where: { uid: id }, data: { status: false } });
 
-    res.status(201).json({ alert });
+        res.status(201).json({ alert });
+    } catch (error) {
+        res.status(500).json({
+            msg: 'Hubo un error al procesar la solicitud'
+        });
+    }
+
 };
 
-module.exports = {
+export {
     alertsPost,
     alertsDelete
 }

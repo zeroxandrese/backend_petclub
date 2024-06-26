@@ -1,13 +1,11 @@
-import { Request, Response } from 'express'; // Import Express types
-import { User } from '../models/index'; // Assuming User model import
-import { Alerts } from '../models/index'; // Assuming Alerts model import
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-interface UserWithId {
-  _id: string; // Type for user ID
-}
+const prisma = new PrismaClient();
 
-const idValidatorAlert = async (req: Request, res: Response, next: Function) => {
-  const uid: UserWithId | undefined = req.userAuth; // Type UserWithId or undefined
+const idValidatorAlert = async (req= request, res= response, next: NextFunction) => {
+  const uid = req.userAuth;
 
   if (!uid) {
     return res.status(500).json({
@@ -24,7 +22,7 @@ const idValidatorAlert = async (req: Request, res: Response, next: Function) => 
   }
 
   try {
-    const validacionIdAlert = await Alerts.findById(id);
+    const validacionIdAlert = await prisma.alerts.findUnique({ where: { uid: id } });
 
     if (!validacionIdAlert) {
       return res.status(400).json({
@@ -32,7 +30,7 @@ const idValidatorAlert = async (req: Request, res: Response, next: Function) => 
       });
     }
 
-    if (uid._id !== validacionIdAlert.user.toString()) { // Use toString() for comparison
+    if (uid.uid !== validacionIdAlert.user.toString()) { // Use toString() for comparison
       return res.status(401).json({
         msg: 'El uid no corresponde tiene alertas en esta foto',
       });
@@ -47,4 +45,4 @@ const idValidatorAlert = async (req: Request, res: Response, next: Function) => 
   }
 };
 
-export { idValidatorAlert };
+export default idValidatorAlert;

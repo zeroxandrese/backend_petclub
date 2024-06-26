@@ -1,25 +1,30 @@
-const cron = require('node-cron');
-const { RecoveryPassword } = require('../models/index');
-const { dbContection } = require('../database/config');
+import { CronJob } from 'cron';
+import dbConnection from '../database/config';
+import { PrismaClient } from '@prisma/client';
 
-require('dotenv').config();
+const prisma = new PrismaClient();
 
-// definicion de job cada minuto
-cron.schedule('0 */2 * * *', async () => {
-
+const job = new CronJob('0 */2 * * *', async () => {
   try {
-    await dbContection();
-    
-    const cutoffTime = new Date(Date.now() - 4 * 60 * 1000);
+      await dbConnection();
 
-    // Actualizacion de status de los registros cuya fecha de creación sea mayor a 4 minutos
-   const result = await RecoveryPassword.updateMany(
-      { charged: { $lte: cutoffTime } },
-      { $set: { status: false } },
-      { maxTimeMS: 60000 }
-    );
+      const cutoffTime = new Date(Date.now() - 4 * 60 * 1000);
+
+      // Actualización de los registros
+      const updatedRecords = await prisma.recoveryPassword.updateMany({
+          where: {
+              charged: { lte: cutoffTime }
+          },
+          data: {
+              status: false
+          }
+      });
+
+      console.log(`Se actualizaron ${updatedRecords.count} registros`);
 
   } catch (error) {
-    console.error('Error al actualizar registros:', error);
+      console.error('Error al actualizar registros:', error);
   }
 });
+
+export default job;

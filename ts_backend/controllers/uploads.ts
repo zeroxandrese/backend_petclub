@@ -1,13 +1,17 @@
-const { response } = require('express');
-const path = require('path');
-const fs = require('fs');
+import { response, query } from 'express';
+import { v2 as cloudinary } from 'cloudinary';
 
-const cloudinary = require('cloudinary').v2;
-cloudinary.config(process.env.CLOUDINARY_URL);
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_name,
+    api_key: process.env.CLOUDINARY_apikey,
+    api_secret: process.env.CLOUDINARY_apisecret,
+    secure: true
+  });
 
-const { uploadFileValidation } = require('../helpers/upload-file');
-const { User, Image, Pet } = require('../models/index');
-const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
+import uploadFileValidation from '../helpers/upload-file';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 // funcion para carga de imaganes de prueba no utilizar!!
 /* const uploadsFiles = async (req, res = response) => {
@@ -65,140 +69,158 @@ const noImagePath = path.join(__dirname, '../assets/', 'no-image.jpg');
     res.json(modelo)
 } */
 
-const cloudinaryUploadFile = async (req, res = response) => {
+const cloudinaryUploadFile = async (req: any, res = response) => {
     const uid = await req.userAuth;
     const { id, collection } = req.params;
 
     let modelo;
+
     if (id === 'undefined' || id === undefined || '') {
         return res.status(400).json({
-            msg: 'ID no valido'
-        })
+            msg: 'ID no válido'
+        });
     }
 
-    const uid1 = JSON.stringify(uid._id);
-    const uidUpdate = uid1.slice(1, -1);
+    const uidUpdate = String(uid.uid);
 
-    switch (collection) {
-        case 'users':
-            modelo = await User.findById(id);
-            const uid3 = JSON.stringify(modelo._id);
-            const uidUpdate3 = uid3.slice(1, -1);
-            if (uidUpdate3 !== uidUpdate) {
-                return res.status(401).json({
-                    msg: 'El uid no corresponde'
-                });
-            }
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
-                });
-            }
-            break;
-        case 'images':
-            modelo = await Image.findById(id)
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
-                });
-            }
-            break;
-        case 'pets':
-            modelo = await Pet.findById(id)
-            const uid2 = JSON.stringify(modelo.user);
-            const uidUpdate2 = uid2.slice(1, -1);
-            if (uidUpdate2 !== uidUpdate) {
-                return res.status(401).json({
-                    msg: 'El uid no corresponde'
-                });
-            }
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
-                });
-            }
-            break;
-
-        default:
-            return res.status(500).json({
-                msg: 'Coleccion no incluida, comunicate con el admin'
-            });
-    }
-
-    // limpieza de archivos anteriores
-    if (modelo.img) {
-        const nameArr = modelo.img.split('/');
-        const name = nameArr[nameArr.length - 1];
-        const [public_id] = name.split('.');
-        cloudinary.uploader.destroy(public_id);
-    }
-
-    const { name, tempFilePath } = req.files.file;
     try {
-        const nameValitation = await uploadFileValidation(name, undefined);
-        if (nameValitation === false) {
+        switch (collection) {
+            case 'users':
+                modelo = await prisma.user.findUnique({
+                    where: { uid: id }
+                });
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'El UUID no existe'
+                    });
+                }
+                if (modelo.uid !== uidUpdate) {
+                    return res.status(401).json({
+                        msg: 'El UID no corresponde'
+                    });
+                }
+                break;
+            case 'images':
+                modelo = await prisma.image.findUnique({
+                    where: { uid: id }
+                });
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'El UUID no existe'
+                    });
+                }
+                break;
+            case 'pets':
+                modelo = await prisma.pet.findUnique({
+                    where: { uid: id }
+                });
+                if (!modelo) {
+                    return res.status(400).json({
+                        msg: 'El UUID no existe'
+                    });
+                }
+                if (modelo.user !== uidUpdate) {
+                    return res.status(401).json({
+                        msg: 'El UID no corresponde'
+                    });
+                }
+                break;
+            default:
+                return res.status(500).json({
+                    msg: 'Colección no incluida, comunícate con el administrador'
+                });
+        }
+
+        // Limpieza de archivos anteriores en Cloudinary
+        if (modelo.img) {
+            const publicId = modelo.img.split('/').slice(-1)[0].split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        // Subida del nuevo archivo a Cloudinary
+        const { name, tempFilePath } = req.files.file;
+        const nameValidation = await uploadFileValidation(name, undefined);
+        if (!nameValidation) {
             return res.status(401).json({
-                msg: 'La extensión no esta permitida'
+                msg: 'La extensión no está permitida'
             });
         }
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
         modelo.img = secure_url;
 
-        await modelo.save();
+        // Actualización del modelo en la base de datos
+        switch (collection) {
+            case 'users':
+                await prisma.user.update({
+                    where: { uid: id },
+                    data: { img: secure_url }
+                });
+                break;
+            case 'images':
+                await prisma.image.update({
+                    where: { uid: id },
+                    data: { img: secure_url }
+                });
+                break;
+            case 'pets':
+                await prisma.pet.update({
+                    where: { uid: id },
+                    data: { img: secure_url }
+                });
+                break;
+            default:
+                break;
+        }
 
-        res.json(modelo)
+        res.json(modelo);
     } catch (error) {
-        console.log(error)
-
+        console.error('Error al procesar la solicitud:', error);
+        res.status(500).json({ msg: 'Error al procesar la solicitud' });
     }
-}
+};
 
-const getUpload = async (req, res = response) => {
+const getUpload = async (req: any, res = response) => {
     const { id, collection } = req.params;
 
     let modelo;
 
-    switch (collection) {
-        case 'users':
-            modelo = await User.findById(id)
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
+    try {
+        switch (collection) {
+            case 'users':
+                modelo = await prisma.user.findUnique({
+                    where: { uid: id }
                 });
-            }
-            break;
-        case 'images':
-            modelo = await Image.findById(id)
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
+                break;
+            case 'images':
+                modelo = await prisma.image.findUnique({
+                    where: { uid: id }
                 });
-            }
-            break;
-        case 'pets':
-            modelo = await Pet.findById(id)
-            if (!modelo) {
-                return res.status(400).json({
-                    msg: 'El uuid no existe'
+                break;
+            case 'pets':
+                modelo = await prisma.pet.findUnique({
+                    where: { uid: id }
                 });
-            }
-            break;
+                break;
+            default:
+                return res.status(500).json({
+                    msg: 'Colección no incluida, comunícate con el administrador'
+                });
+        }
 
-        default:
-            return res.status(500).json({
-                msg: 'Coleccion no incluida, comunicate con el admin'
+        if (!modelo) {
+            return res.status(400).json({
+                msg: 'El UUID no existe'
             });
-    }
-    // validacion existe img
-    if (modelo.img) {
-        return res.json(modelo);
-    }
+        }
 
-    res.sendFile(noImagePath)
-}
+        res.json(modelo);
+    } catch (error) {
+        console.error('Error al procesar la solicitud:', error);
+        res.status(500).json({ msg: 'Error al procesar la solicitud' });
+    }
+};
 
-module.exports = {
-    /* uploadsFiles, */
+export {
     cloudinaryUploadFile,
     getUpload
 }

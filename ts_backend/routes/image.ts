@@ -1,12 +1,12 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { imagesPost, imagesDelete, imagesGet, imagesPut } = require('../controllers/image');
-const { findIdImg, isActionPlan } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorImg } = require('../helpers/id-validator-img');
-const { verifyUploadFile } = require('../middelwares/validar-archivo');
+import validarCampos from '../middelwares/validar-campos';
+import { imagesPost, imagesDelete, imagesGet, imagesPut } from '../controllers/image';
+import { findIdImg, isActionPlan } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import idValidatorImg from '../helpers/id-validator-img';
+import verifyUploadFile from '../middelwares/validar-archivo';
 
 const router = Router();
 
@@ -38,4 +38,4 @@ router.delete('/:id', [
     validarCampos
 ], imagesDelete);
 
-module.exports = router;
+export default router;

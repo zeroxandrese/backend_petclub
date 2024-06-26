@@ -1,32 +1,47 @@
-const { response, query } = require('express');
-const { Resend } = require('resend');
-const { generateJwt } = require('../helpers/generate-jwt');
-let MersenneTwister = require('mersenne-twister');
+import { response, query } from 'express';
+import { Resend } from 'resend';
+import MersenneTwister from 'mersenne-twister';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import { generateJwt } from '../helpers/generate-jwt';
+
 let generator = new MersenneTwister();
 
-const { RecoveryPassword, User } = require('../models/index');
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 
-const recoveryPasswordPost = async (req, res = response) => {
+const recoveryPasswordPost = async (req: any, res = response) => {
 
     const { code } = req.body;
     const email = req.params.email;
-    const user = await User.findOne({ email })
+    const user = await prisma.user.findUnique({ where: { email } })
     if (!code) {
         return res.status(401).json({
             msg: 'Necesita enviar un código'
         })
     };
 
+    if (!user) {
+        return res.status(401).json({
+            msg: 'Error con el usuario'
+        })
+    };
+
     try {
-        const resp = await RecoveryPassword.findOne({ user: user._id, status: true, code: code });
+        const resp = await prisma.recoveryPassword.findFirst({
+            where: {
+                user: user.uid, status: true, code: code
+            }
+        });
 
         //Generar JWT
-        const token = await generateJwt(user._id);
+        const token = await generateJwt(user.uid);
 
         if (resp) {
             res.status(201).json({
-                uid: user._id,
+                uid: user.uid,
                 msg: 'Código autorizado',
                 token
             });
@@ -40,7 +55,7 @@ const recoveryPasswordPost = async (req, res = response) => {
     }
 };
 
-const recoveryPasswordPostValidation = async (req, res = response) => {
+const recoveryPasswordPostValidation = async (req: any, res = response) => {
 
     const resend = new Resend(process.env.RESENDKEY);
 
@@ -52,14 +67,14 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
     };
 
     try {
-        const user = await User.findOne({ email });
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             return res.status(401).json({
                 msg: 'Email no registrado'
             })
         };
 
-        const repeatValidation = await RecoveryPassword.findOne({ user: user._id, status: true });
+        const repeatValidation = await prisma.recoveryPassword.findFirst({ where: { user: user.uid, status: true } });
 
         if (repeatValidation) {
             return res.status(401).json({
@@ -69,15 +84,14 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
 
         const { nombre } = user;
 
-        code = Math.floor(generator.random() * 9000) + 1000;
+        const code = Math.floor(generator.random() * 9000) + 1000;
 
-        const data = {
-            user: user,
-            code
-        }
-
-        const recoveryPassword = new RecoveryPassword(data);
-        await recoveryPassword.save();
+        await prisma.recoveryPassword.create({
+            data: {
+                user: user.uid,
+                code
+            }
+        });
 
         await resend.emails.send({
             from: "petClub <admin@petclub.com.pe>",
@@ -143,7 +157,7 @@ const recoveryPasswordPostValidation = async (req, res = response) => {
     }
 };
 
-module.exports = {
+export {
     recoveryPasswordPostValidation,
     recoveryPasswordPost
 };

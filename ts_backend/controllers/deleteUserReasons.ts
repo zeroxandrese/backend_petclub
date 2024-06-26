@@ -1,8 +1,15 @@
-const { response } = require('express');
+import { response, query } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { DeleteUserReasons, User } = require('../models/index');
+interface AuthenticatedRequest extends Request {
+    userAuth?: {
+        _id: string;
+    }
+}
 
-const deleteUserReasonsPost = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const deleteUserReasonsPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { alert, note } = req.body;
@@ -11,36 +18,49 @@ const deleteUserReasonsPost = async (req, res = response) => {
             msg: 'Necesita enviar una interacción'
         })
     }
-    const data = {
-        user: uid._id,
-        alert,
-        note
-    }
 
-    const deleteUserReasons = new DeleteUserReasons(data);
+    await prisma.deleteUserReasons.create({
+        data: {
+            user: uid.uid,
+            alert,
+            note
+        }
+    });
 
-    await deleteUserReasons.save();
-
-    await User.findByIdAndUpdate(uid, { status: false });
+    await prisma.user.update({ where: { uid: uid.uid }, data: { status: false } });
 
     res.status(201).json({
         msg: 'Razones de eliminación enviadas de manera satisfactoria'
     });
 };
 
-const deleteUserReasonsDelete = async (req, res = response) => {
-    const uid = await req.userAuth;
+const deleteUserReasonsDelete = async (req: any, res = response) => {
+    const uid = req.userAuth;
     //const deleteUserReasons = await DeleteUserReasons.findByIdAndDelete( id );
+    try {
+        //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
+        const idDelete = await prisma.deleteUserReasons.findUnique({ where: { uid: uid.uid } })
 
-    //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const idDelete = await DeleteUserReasons.findOne({ uid })
-    await DeleteUserReasons.findByIdAndUpdate(idDelete, { status: false });
-    const userReturn = await User.findByIdAndUpdate(uid, { status: true });
+        if (!idDelete) {
+            return res.status(401).json({
+                msg: 'Usuario no identificado'
+            })
+        }
 
-    res.status(201).json({ userReturn });
-};
+        await prisma.deleteUserReasons.update({
+            where: { uid: idDelete.uid }
+            , data: { status: false }
+        });
+        const userReturn = await prisma.user.update({ where: { uid: uid.uid }, data: { status: true } });
 
-module.exports = {
+        res.status(201).json({ userReturn });
+    } catch (error) {
+        res.status(500).json({ error: 'Error contacte al admin' });
+    }
+}
+
+
+export {
     deleteUserReasonsPost,
     deleteUserReasonsDelete
 }

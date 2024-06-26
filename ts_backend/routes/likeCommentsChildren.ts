@@ -1,27 +1,27 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { likeCommentsChildrenPost,
+import validarCampos from '../middelwares/validar-campos';
+import { likeCommentsChildrenPost,
     likeCommentsChildrenGet,
-    likeCommentsChildrenDelete } = require('../controllers/likeCommentsChildren');
-const { findIdComChild, findIdLikeCommentsChildren } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorLikeCommentsChildren } = require('../helpers/id-validator-likeCommentsChildren');
+    likeCommentsChildrenDelete } from '../controllers/likeCommentsChildren';
+import { findIdComChil, findIdLikeCommentsChildren } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import idValidatorLikeCommentsChildren from '../helpers/id-validator-likeCommentsChildren';
 
 const router = Router();
 
 router.get('/:id', [
     validarJWT,
     check('id', 'El id no es valido').isMongoId(),
-    check('id').custom(findIdComChild),
+    check('id').custom(findIdComChil),
     validarCampos
 ], likeCommentsChildrenGet);
 
 router.post('/:id', [
     validarJWT,
     check('id', 'El id no es valido').isMongoId(),
-    check('id').custom(findIdComChild),
+    check('id').custom(findIdComChil),
     validarCampos
 ], likeCommentsChildrenPost);
 
@@ -33,4 +33,4 @@ router.post('/:id', [
     validarCampos
 ], likeCommentsChildrenDelete); */
 
-module.exports = router;
+export default router;

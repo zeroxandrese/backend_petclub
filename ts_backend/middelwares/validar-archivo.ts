@@ -1,21 +1,20 @@
-const { response } = require('express');
+import type { Request, Response } from 'express';
 
-
-const verifyUploadFile = ( req, res = response, next) =>{
+const verifyUploadFile = (req: Request, res: Response, next: () => void) => {
+    // Verificar si hay archivos en la solicitud
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({
             msg: 'No files were uploaded.'
         });
     }
-    if (!req.files.file || Object.keys(req.files).length === 0) {
-        res.status(400).json({
-            msg: 'No existen archivos para cargar.'
+
+    if (!req.files.file) {
+        return res.status(400).json({
+            msg: 'No existe el archivo "file" para cargar.'
         });
     }
 
     next();
 };
 
-module.exports = {
-    verifyUploadFile
-}
+export default verifyUploadFile;

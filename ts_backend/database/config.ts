@@ -6,6 +6,9 @@ interface DbConnectionError extends Error {
 
 const dbConnection = async (): Promise<void> => {
   try {
+
+    mongoose.set("strictQuery", true);
+
     await mongoose.connect(process.env.MONGODB_CNN!, {
       //useNewUrlParser: true,
       //useUnifiedTopology: true,

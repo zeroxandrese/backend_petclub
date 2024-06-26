@@ -1,54 +1,79 @@
-const { response, query } = require('express');
-const cloudinary = require('cloudinary').v2;
-cloudinary.config(process.env.CLOUDINARY_URL);
+import { response, query } from 'express';
+import { v2 as cloudinary } from 'cloudinary';
 
-const { Pet, Image } = require('../models/index');
-const { uploadFileValidation } = require('../helpers/upload-file');
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_name,
+    api_key: process.env.CLOUDINARY_apikey,
+    api_secret: process.env.CLOUDINARY_apisecret,
+    secure: true
+  });
+import NodeGeocoder from 'node-geocoder';
 
-const NodeGeocoder = require('node-geocoder');
+import { PrismaClient } from '@prisma/client';
+import uploadFileValidation from '../helpers/upload-file';
 
-const options = {
+const options: NodeGeocoder.Options = {
     provider: 'google',
     apiKey: process.env.key,
 };
 
+const prisma = new PrismaClient();
 
 const geocoder = NodeGeocoder(options);
 
-const petsGet = async (req, res = response) => {
+const petsGet = async (req: any, res = response) => {
     const { page } = req.query;
-    const options = { page: page || 1, limit: 10 }
-    const query = { status: true };
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = 10;
 
-    const pets = await Pet.paginate(query, options)
-    res.status(201).json(pets);
+    try {
+        const pets = await prisma.pet.findMany({
+            where: {
+                status: true
+            },
+            skip: (pageNumber - 1) * pageSize,
+            take: pageSize,
+        });
+
+        res.status(201).json(pets);
+    } catch (error) {
+        console.error('Error fetching pets:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
 };
 
-const petsGetOneOfUser = async (req, res = response) => {
+const petsGetOneOfUser = async (req: any, res = response) => {
     const id = req.params.id;
 
     // Se busca al un id de mascota es especifico
-    const pet = await Pet.findById(id);
+    const pet = await prisma.pet.findFirst({ where: { uid: id } });
     res.status(201).json({ pet });
 };
 
-const petsGetAllOfUser = async (req, res = response) => {
+const petsGetAllOfUser = async (req: any, res = response) => {
     const id = req.params.id;
 
     // Se busca al un id de mascota es especifico
-    const pet = await Pet.find({ id });
+    const pet = await prisma.pet.findMany({
+        where: { user: id }
+    });
     res.status(201).json({ pet });
 };
 
-const petsPut = async (req, res = response) => {
+const petsPut = async (req: any, res = response) => {
     const id = req.params.id;
     const { ...pet } = req.body;
     const { perdido, lantitudeEvento, fechaEvento, longitudeEvento, horaEvento, nombre, sexo, tipo, edad, raza, descripcion } = req.body;
 
     try {
-        const petPutValidation = await Pet.findById(id);
+        const petPutValidation = await prisma.pet.findUnique({ where: { uid: id } });
 
-        if (petPutValidation.perdido === false && perdido === true && longitudeEvento && lantitudeEvento && fechaEvento && horaEvento) {
+        if (!petPutValidation) {
+            return res.status(404).json({ msg: 'Pet not found.' });
+        }
+
+        if (petPutValidation && petPutValidation.perdido === false && perdido === true && longitudeEvento && lantitudeEvento && fechaEvento && horaEvento) {
 
             const lantitudePerdidaNumber = parseFloat(lantitudeEvento);
             const longitudePerdidaNumber = parseFloat(longitudeEvento);
@@ -59,28 +84,29 @@ const petsPut = async (req, res = response) => {
             const monthNamesLost = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             const monthIndexLost = dateLost?.getMonth() ?? null;
             const yearLost = dateLost?.getFullYear();
+            const finalUserVisibleDate = (dayLost !== undefined && monthIndexLost !== null && yearLost !== undefined)
+                ? `${dayLost} de ${monthNamesLost[monthIndexLost]} del ${yearLost}`
+                : '';
 
-            const data = {
-                user: petPutValidation.user,
-                pet: id,
-                img: petPutValidation.img,
-                descripcion: petPutValidation.descripcion,
-                actionPlan: "LOST",
-                fechaEvento: fechaEvento || new Date(),
-                horaEvento: horaEvento || '',
-                longitudeEvento: longitudeEvento || 0,
-                lantitudeEvento: lantitudeEvento || 0,
-                namePet: petPutValidation.nombre,
-                finalUserVisibleAddress: resAddress[0].formattedAddress,
-                finalUserVisibleDate: `${dayLost} de ${monthNamesLost[monthIndexLost]} del ${yearLost}`
-            };
+            await prisma.image.create({
+                data: {
+                    user: petPutValidation.user,
+                    pet: id,
+                    img: petPutValidation.img,
+                    descripcion: petPutValidation.descripcion,
+                    actionPlan: "LOST",
+                    fechaEvento: fechaEvento || new Date(),
+                    horaEvento: horaEvento || '',
+                    longitudeEvento: longitudeEvento || 0,
+                    lantitudeEvento: lantitudeEvento || 0,
+                    namePet: petPutValidation.nombre,
+                    finalUserVisibleAddress: resAddress[0].formattedAddress,
+                    finalUserVisibleDate: finalUserVisibleDate
+                }
+            })
 
-            const image = new Image(data);
-            await image.save();
-
-            // Actualiza la mascota y envía una respuesta 201 Created
-            const mascota = await Pet.findByIdAndUpdate(id, pet, { new: true }); 
-            return res.status(201).json({pet: mascota});
+            const mascota = await prisma.pet.update({ where: { uid: id }, data: { ...pet } });
+            return res.status(201).json({ pet: mascota });
 
         }
 
@@ -88,17 +114,26 @@ const petsPut = async (req, res = response) => {
             if (perdido === true) {
                 return res.status(400).json({ msg: 'La mascota ya fue reportada.' });
             } else {
-                const mascota = await Pet.findByIdAndUpdate(id, pet, { new: true });
-                const resp = await Image.findOne({ user: petPutValidation.user, status: true, pet: id, actionPlan: "LOST" });
+                const mascota = await prisma.pet.update({ where: { uid: id }, data: { ...pet } });
+                const resp = await prisma.image.findFirst({
+                    where: {
+                        user: petPutValidation.user,
+                        status: true, pet: id,
+                        actionPlan: "LOST"
+                    }
+                });
                 if (resp) {
-                    await Image.findByIdAndUpdate(resp._id, { status: false });
+                    await prisma.image.update({
+                        where: { uid: resp.uid },
+                        data: { status: false }
+                    })
                 }
-                return res.status(201).json({pet: mascota});
+                return res.status(201).json({ pet: mascota });
             }
         }
 
         if (nombre || sexo || tipo || edad || raza || descripcion) {
-            const pets = await Pet.findByIdAndUpdate(petPutValidation._id, pet, { new: true });
+            const pets = await prisma.pet.update({ where: { uid: petPutValidation.uid }, data: { ...pet } });
             return res.status(201).json({ pet: pets });
         }
 
@@ -108,7 +143,7 @@ const petsPut = async (req, res = response) => {
     }
 };
 
-const petsPost = async (req, res = response) => {
+const petsPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { name, tempFilePath } = req.files.file;
@@ -123,21 +158,59 @@ const petsPost = async (req, res = response) => {
 
         const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
 
-        const data = {
-            user: uid._id,
-            img: secure_url,
-            nombre: req.body.data ? JSON.parse(req.body.data).nombre : '',
-            sexo: req.body.data ? JSON.parse(req.body.data).sexo : '',
-            tipo: req.body.data ? JSON.parse(req.body.data).tipo : '',
-            edad: req.body.data ? JSON.parse(req.body.data).edad : '',
-            descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
-            raza: req.body.data ? JSON.parse(req.body.data).raza : ''
-        };
+        const pet = await prisma.pet.create({
+            data: {
+                user: uid._id,
+                img: secure_url,
+                nombre: req.body.data ? JSON.parse(req.body.data).nombre : '',
+                sexo: req.body.data ? JSON.parse(req.body.data).sexo : '',
+                tipo: req.body.data ? JSON.parse(req.body.data).tipo : '',
+                edad: req.body.data ? JSON.parse(req.body.data).edad : '',
+                descripcion: req.body.data ? JSON.parse(req.body.data).descripcion : '',
+                raza: req.body.data ? JSON.parse(req.body.data).raza : ''
+            }
+        });
 
-        const pet = new Pet(data);
+        const idResult = await prisma.pawsCount.findFirst({ where: { user: uid.uid } });
 
-        await pet.save();
-
+        if (!idResult) {
+  
+          await prisma.pawsCount.create({
+            data: {
+              user: uid.uid,
+              paws: 5,
+              lastUpdate: new Date()
+            }
+          });
+  
+        } else {
+          if (idResult.paws !== null) {
+            await prisma.pawsCount.update({
+              where: { uid: idResult.uid }, data: { paws: idResult.paws + 5, lastUpdate: new Date() }
+            });
+          }
+        }
+  
+        const idResultPoint = await prisma.tokenPoint.findFirst({
+          where:
+            { user: uid.uid }
+        });
+  
+        if (!idResultPoint) {
+          await prisma.tokenPoint.create({
+            data: {
+              user: uid.uid,
+              points: 50,
+              lastUpdate: new Date()
+            }
+          });
+  
+        } else {
+          if (idResultPoint.points !== null) {
+            await prisma.tokenPoint.update({ where: { uid: idResultPoint.uid }, data: { points: idResultPoint.points + 50, lastUpdate: new Date() } })
+          }
+        }
+  
         res.status(201).json({
             pet
         });
@@ -149,18 +222,20 @@ const petsPost = async (req, res = response) => {
     }
 };
 
-const petsDelete = async (req, res = response) => {
+const petsDelete = async (req: any, res = response) => {
     const id = req.params.id;
     //Borrar usuario permanentemente
     //const usuario = await User.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const pet = await Pet.findByIdAndUpdate(id, { status: false });
+    const pet = await prisma.pet.update({
+        where: { uid: id }, data: { status: false }
+    });
 
     res.status(201).json({ pet });
 };
 
-module.exports = {
+export {
     petsGet,
     petsPut,
     petsPost,

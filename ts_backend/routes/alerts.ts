@@ -1,12 +1,11 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-const { validarCampos } = require('../middelwares/validar-campos');
-const { alertsPost,
-    alertsDelete } = require('../controllers/alert');
-const { findIdImg, findIdAlert } = require('../helpers/db-validators');
-const { validarJWT } = require('../middelwares/validar-jwt');
-const { idValidatorAlert } = require('../helpers/id-validador-alert');
+import validarCampos from '../middelwares/validar-campos';
+import { alertsPost, alertsDelete } from '../controllers/alert';
+import { findIdImg, findIdAlert } from '../helpers/db-validators';
+import validarJWT from '../middelwares/validar-jwt';
+import idValidatorAlert from '../helpers/id-validador-alert';
 
 const router = Router();
 
@@ -25,4 +24,4 @@ router.delete('/:id', [
     validarCampos
 ], alertsDelete);
 
-module.exports = router;
+export default router;

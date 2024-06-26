@@ -1,9 +1,10 @@
-const { response } = require("express");
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { CommentsChildren, Comments } = require('../models/index');
+const prisma = new PrismaClient();
 
-
-const idValidatorComChil = async (req, res = response, next) => {
+const idValidatorComChil = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     if(id === 'undefined' || id === undefined || ''){
@@ -11,7 +12,7 @@ const idValidatorComChil = async (req, res = response, next) => {
             msg: 'ID no valido'
         })
     }
-    const validacionIdComChil = await CommentsChildren.findById(id);
+    const validacionIdComChil = await prisma.commentsChildren.findUnique({ where: { uid: id } });;
 
     if(validacionIdComChil === null){
         return res.status(400).json({
@@ -19,7 +20,7 @@ const idValidatorComChil = async (req, res = response, next) => {
         })
     }
 
-    const uid1 = JSON.stringify(uid._id);
+    const uid1 = JSON.stringify(uid?.uid);
     const uidUpdate = uid1.slice(1, -1);
 
     const uid2 = JSON.stringify(validacionIdComChil.user);
@@ -51,7 +52,7 @@ const idValidatorComChil = async (req, res = response, next) => {
 
 }
 
-const idValidatorComChilOwner = async (req, res = response, next) => {
+const idValidatorComChilOwner = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
 
@@ -66,7 +67,7 @@ const idValidatorComChilOwner = async (req, res = response, next) => {
                 msg: 'ID no valido'
             })
         }
-        const validacionIdCom = await CommentsChildren.findById(id);
+        const validacionIdCom = await prisma.commentsChildren.findUnique({ where: { uid: id } });
     
         if(validacionIdCom === null){
             return res.status(400).json({
@@ -74,10 +75,10 @@ const idValidatorComChilOwner = async (req, res = response, next) => {
             })
         }
         const validacionIdCom2 = validacionIdCom.uidCommentsFather;
-        const validacionIdCom3 = await Comments.findById(validacionIdCom2);
-        const uid1 = JSON.stringify(uid._id);
+        const validacionIdCom3 = await prisma.comments.findUnique({ where: { uid: validacionIdCom2 } });
+        const uid1 = JSON.stringify(uid?.uid);
         const uidUpdate = uid1.slice(1, -1);
-        const uid2 = JSON.stringify(validacionIdCom3.user);
+        const uid2 = JSON.stringify(validacionIdCom3?.user);
         const uidUpdate2 = uid2.slice(1, -1);
         const uid3 = JSON.stringify(validacionIdCom.user);
         const uidUpdate3 = uid3.slice(1, -1);
@@ -97,7 +98,7 @@ const idValidatorComChilOwner = async (req, res = response, next) => {
     }
 }
 
-module.exports = {
+export {
     idValidatorComChil,
     idValidatorComChilOwner
 }

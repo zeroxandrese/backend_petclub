@@ -1,8 +1,10 @@
-const { response } = require("express");
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { Report } = require('../models/index');
+const prisma = new PrismaClient();
 
-const idValidatorReport = async (req, res = response, next) => {
+const idValidatorReport = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     if(id === 'undefined' || id === undefined || ''){
@@ -10,7 +12,7 @@ const idValidatorReport = async (req, res = response, next) => {
             msg: 'ID no valido'
         })
     }
-    const validacionIdReport = await Report.findById(id);
+    const validacionIdReport = await prisma.report.findUnique({ where: { uid: id } });
 
     if(validacionIdReport === null){
         return res.status(400).json({
@@ -18,7 +20,7 @@ const idValidatorReport = async (req, res = response, next) => {
         })
     }
 
-    const uid1 = JSON.stringify(uid._id);
+    const uid1 = JSON.stringify(uid?.uid);
     const uidUpdate = uid1.slice(1, -1);
 
     const uid2 = JSON.stringify(validacionIdReport.user);
@@ -48,6 +50,4 @@ const idValidatorReport = async (req, res = response, next) => {
 
 }
 
-module.exports = {
-    idValidatorReport
-}
+export default idValidatorReport;

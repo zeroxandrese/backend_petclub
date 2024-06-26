@@ -1,10 +1,9 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from 'express';
+import { check } from 'express-validator';
 
-
-const { login, googleLogin, verifyToken } = require('../controllers/auth');
-const { validarCampos } = require('../middelwares/validar-campos');
-const { validarJWT } = require('../middelwares/validar-jwt');
+import { login, googleLogin, verifyToken } from '../controllers/auth';
+import validarCampos from '../middelwares/validar-campos';
+import validarJWT from '../middelwares/validar-jwt';
 
 
 const router = Router();
@@ -24,4 +23,4 @@ router.post('/login/google', [
     validarCampos
 ], googleLogin);
 
-module.exports = router;
+export default router;

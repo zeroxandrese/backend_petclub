@@ -1,19 +1,34 @@
-const { response, query } = require('express');
+import { response, query } from 'express';
 
-const { LikeComments } = require('../models/index');
+import { PrismaClient } from '@prisma/client';
 
-const likeCommentsGet = async (req, res = response) => {
+const prisma = new PrismaClient();
+
+const likeCommentsGet = async (req: any, res = response) => {
     const id = req.params.id;
     const { page } = req.query;
-    const options = { page: page || 1, limit: 10 };
-    const query = { uidComments: id, status: true };
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = 100;
 
-    // se estan enviando dos promesas al mismo tiempo para calcular el paginado de likes
-    const likeComments = await LikeComments.paginate(query, options)
+    try {
+        const likeComments = await prisma.likeComments.findMany({
+            where: {
+                uidComments: id,
+                status: true,
+            },
+            skip: (pageNumber - 1) * pageSize,
+            take: pageSize,
+        });
+
         res.status(201).json(likeComments);
+    } catch (error) {
+        console.error('Error fetching likeComments:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
 };
 
-const likeCommentsPost = async (req, res = response) => {
+const likeCommentsPost = async (req: any, res = response) => {
 
     const uid = await req.userAuth;
     const { like } = req.body;
@@ -23,31 +38,30 @@ const likeCommentsPost = async (req, res = response) => {
             msg: 'Necesita enviar una interaccion'
         })
     }
-    const data = {
-        user: uid._id,
-        uidComments: id,
-        like
-    }
 
-    const likesComments = new LikeComments(data);
-
-    await likesComments.save();
+    const likesComments = await prisma.likeComments.create({
+        data: {
+            user: uid.uid,
+            uidComments: id,
+            like
+        }
+    });
 
     res.status(201).json(likesComments);
 };
 
-const likeCommentsDelete = async (req, res = response) => {
+const likeCommentsDelete = async (req: any, res = response) => {
     const id = req.params.id;
     //Borrar comentario permanentemente
     //const comments = await Comments.findByIdAndDelete( id );
 
     //Se modifica el status en false para mapearlo como eliminado sin afectar la integridad
-    const likesComments = await LikeComments.findByIdAndUpdate(id, { status: false });
+    const likesComments = await prisma.likeComments.update({ where: { uid: id }, data: { status: false } });
 
     res.status(201).json({ likesComments });
 };
 
-module.exports = {
+export {
     likeCommentsGet,
     likeCommentsPost,
     likeCommentsDelete

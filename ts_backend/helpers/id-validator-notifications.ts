@@ -1,9 +1,11 @@
-const { response } = require("express");
+import { response, request  } from 'express';
+import type { NextFunction, Request } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-const { Notifications } = require('../models/index');
+const prisma = new PrismaClient();
 
 
-const idValidatorNotifications = async (req, res = response, next) => {
+const idValidatorNotifications = async (req=request, res=response, next: NextFunction) => {
     const uid = await req.userAuth;
     const id = req.params.id;
     if(id === 'undefined' || id === undefined || ''){
@@ -11,7 +13,7 @@ const idValidatorNotifications = async (req, res = response, next) => {
             msg: 'ID no valido'
         })
     }
-    const validacionIdNotifications = await Notifications.findById(id);
+    const validacionIdNotifications = await prisma.notifications.findUnique({ where: { uid: id } });
 
     if(validacionIdNotifications === null){
         return res.status(400).json({
@@ -19,7 +21,7 @@ const idValidatorNotifications = async (req, res = response, next) => {
         })
     }
 
-    const uid1 = JSON.stringify(uid._id);
+    const uid1 = JSON.stringify(uid?.uid);
     const uidUpdate = uid1.slice(1, -1);
 
     const uid2 = JSON.stringify(validacionIdNotifications.userSender);
@@ -51,6 +53,4 @@ const idValidatorNotifications = async (req, res = response, next) => {
 
 }
 
-module.exports = {
-    idValidatorNotifications
-}
+export default idValidatorNotifications;
